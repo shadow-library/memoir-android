@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.ShadowMemoir" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- App theme: dark-first, consistent with the splash background to prevent flicker.
+         Uses the dark Material parent so all window surfaces default to dark slate
+         before enableEdgeToEdge() takes over in MainActivity. -->
+    <style name="Theme.ShadowMemoir" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/slate_background_dark</item>
+        <item name="android:statusBarColor">@color/slate_background_dark</item>
+        <item name="android:navigationBarColor">@color/slate_background_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+
 </resources>
