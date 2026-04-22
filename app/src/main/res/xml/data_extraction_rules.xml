@@ -1,19 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-   Sample data extraction rules file; uncomment and customize as necessary.
-   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
-   for details.
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    API 31+ backup and device-transfer rules.
+    See https://developer.android.com/about/versions/12/backup-restore#xml-changes
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
+        <!--
+            Exclude encrypted credential stores from Google Drive backup.
+            EncryptedSharedPreferences keys are device-bound (Android Keystore);
+            the ciphertext cannot be decrypted on another device.
         -->
+        <exclude domain="sharedpref" path="memoir_firebase_config.xml" />
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!--
+            Exclude credentials from device-to-device transfer.
+            The user must re-enter Firebase credentials on a new device
+            (or scan the QR code from the primary device).
+        -->
+        <exclude domain="sharedpref" path="memoir_firebase_config.xml" />
     </device-transfer>
-    -->
 </data-extraction-rules>

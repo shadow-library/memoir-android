@@ -2,14 +2,18 @@ package com.shadow.apps.memoir.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.shadow.apps.memoir.R
 
-// System sans-serif (Roboto on Android) until Inter TTF files are added to res/font/.
-// To upgrade: download Inter from fonts.google.com, place in res/font/, and replace
-// FontFamily.SansSerif below with a FontFamily(Font(R.font.inter_regular), ...) declaration.
-val InterFontFamily = FontFamily.SansSerif
+val InterFontFamily = FontFamily(
+    Font(resId = R.font.inter_variable, weight = FontWeight.Normal),
+    Font(resId = R.font.inter_variable, weight = FontWeight.Medium),
+    Font(resId = R.font.inter_variable, weight = FontWeight.SemiBold),
+    Font(resId = R.font.inter_variable, weight = FontWeight.Bold)
+)
 
 // System monospace until JetBrains Mono TTF files are added to res/font/.
 val MonoFontFamily = FontFamily.Monospace
