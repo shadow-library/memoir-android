@@ -68,9 +68,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun ShadowMemoirTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit
-) {
+fun ShadowMemoirTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
         typography = Typography,
