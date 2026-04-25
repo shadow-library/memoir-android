@@ -6,4 +6,5 @@ data class FirebaseCredentials(
     val apiKey: String,
     val storageBucket: String,
     val databaseUrl: String? = null,
+    val webClientId: String? = null,
 )

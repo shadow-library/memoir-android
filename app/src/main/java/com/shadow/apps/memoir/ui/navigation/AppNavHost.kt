@@ -9,13 +9,14 @@ import com.shadow.apps.memoir.ui.onboarding.DeviceTypeScreen
 import com.shadow.apps.memoir.ui.onboarding.FirebaseSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.GettingStartedScreen
 import com.shadow.apps.memoir.ui.onboarding.ScanQrScreen
+import com.shadow.apps.memoir.ui.onboarding.SignInScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
 /**
  * Single navigation graph for the entire app.
  */
 @Composable
-fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
+fun AppNavHost(navController: NavHostController, hasCredentials: Boolean, isSignedIn: Boolean) {
 
     NavHost(navController = navController, startDestination = Splash) {
 
@@ -26,7 +27,11 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
          */
         composable<Splash> {
             SplashScreen(onSplashComplete = {
-                val dest: Any = if (onboardingRequired) GettingStarted else Home
+                val dest: Any = when {
+                    !hasCredentials -> GettingStarted
+                    !isSignedIn -> SignIn
+                    else -> Home
+                }
                 navController.navigate(dest) {
                     popUpTo<Splash> { inclusive = true }
                 }
@@ -43,7 +48,13 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
 
         composable<DeviceType> {
             DeviceTypeScreen(
-                onBack = { navController.popBackStack() },
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(GettingStarted) {
+                            popUpTo<DeviceType> { inclusive = true }
+                        }
+                    }
+                },
                 onSetupNewVault = { navController.navigate(FirebaseSetup) },
                 onPairExistingVault = { navController.navigate(ScanQr) },
             )
@@ -51,25 +62,45 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
 
         composable<FirebaseSetup> {
             FirebaseSetupScreen(
-                onBack = { navController.popBackStack() },
-                /** TODO: navigate to SignIn once that screen is implemented. */
-                onContinue = {
-                    navController.navigate(Home) {
-                        popUpTo<Splash> { inclusive = true }
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(DeviceType) {
+                            popUpTo<FirebaseSetup> { inclusive = true }
+                        }
                     }
                 },
+                onContinue = { navController.navigate(SignIn) },
             )
         }
 
         composable<ScanQr> {
             ScanQrScreen(
-                onBack = { navController.popBackStack() },
-                onContinue = {
-                    navController.navigate(Home) {
-                        popUpTo<Splash> { inclusive = true }
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(DeviceType) {
+                            popUpTo<ScanQr> { inclusive = true }
+                        }
                     }
                 },
+                onContinue = { navController.navigate(SignIn) },
                 onEnterManually = { navController.navigate(FirebaseSetup) },
+            )
+        }
+
+        composable<SignIn> {
+            SignInScreen(
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(FirebaseSetup) {
+                            popUpTo<SignIn> { inclusive = true }
+                        }
+                    }
+                },
+                onContinue = {
+                    navController.navigate(Home) {
+                        popUpTo<SignIn> { inclusive = true }
+                    }
+                },
             )
         }
 

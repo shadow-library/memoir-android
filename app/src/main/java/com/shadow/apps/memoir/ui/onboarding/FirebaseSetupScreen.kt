@@ -46,7 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.shadow.apps.memoir.R
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan5

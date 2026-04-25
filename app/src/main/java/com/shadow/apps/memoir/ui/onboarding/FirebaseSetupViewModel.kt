@@ -33,6 +33,7 @@ class FirebaseSetupViewModel @Inject constructor(private val configStore: Encryp
                     appId = creds.appId,
                     storageBucket = creds.storageBucket,
                     databaseUrl = creds.databaseUrl ?: "",
+                    webClientId = creds.webClientId ?: "",
                     uploadError = null,
                 )
             }
@@ -54,6 +55,7 @@ class FirebaseSetupViewModel @Inject constructor(private val configStore: Encryp
             apiKey = state.apiKey.trim(),
             storageBucket = state.storageBucket.trim(),
             databaseUrl = state.databaseUrl.trim().takeIf { it.isNotBlank() },
+            webClientId = state.webClientId.trim().takeIf { it.isNotBlank() },
         )
         _uiState.update { it.copy(isSaving = false) }
         onSuccess()
@@ -74,7 +76,8 @@ class FirebaseSetupViewModel @Inject constructor(private val configStore: Encryp
      *   },
      *   "client": [{
      *     "client_info": { "mobilesdk_app_id": "…" },
-     *     "api_key": [{ "current_key": "…" }]
+     *     "api_key": [{ "current_key": "…" }],
+     *     "oauth_client": [{ "client_id": "…", "client_type": 3 }]   // web client
      *   }]
      * }
      * ```
@@ -89,12 +92,26 @@ class FirebaseSetupViewModel @Inject constructor(private val configStore: Encryp
         val storageBucket = projectInfo.optString("storage_bucket").takeIf { it.isNotBlank() }
             ?: return@runCatching null
 
+        // Extract the web OAuth client ID (client_type 3) for Google Sign-In
+        var webClientId: String? = null
+        val oauthClients = client.optJSONArray("oauth_client")
+        if (oauthClients != null) {
+            for (i in 0 until oauthClients.length()) {
+                val oauthClient = oauthClients.getJSONObject(i)
+                if (oauthClient.optInt("client_type") == 3) {
+                    webClientId = oauthClient.getString("client_id")
+                    break
+                }
+            }
+        }
+
         FirebaseCredentials(
             projectId = projectInfo.getString("project_id"),
             appId = clientInfo.getString("mobilesdk_app_id"),
             apiKey = apiKey,
             storageBucket = storageBucket,
             databaseUrl = projectInfo.optString("firebase_url").takeIf { it.isNotBlank() },
+            webClientId = webClientId,
         )
     }.getOrNull()
 }

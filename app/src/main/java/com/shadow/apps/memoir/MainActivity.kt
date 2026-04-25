@@ -25,12 +25,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         configStore.loadFirebaseCredentials()?.let { firebaseManager.initialise(it) }
         /** Evaluated once here — stable across recompositions, no side-effects in setContent. */
-        val onboardingRequired = !configStore.hasFirebaseCredentials()
+        val hasCredentials = configStore.hasFirebaseCredentials()
+        val isSignedIn = firebaseManager.isInitialised() && firebaseManager.auth().currentUser != null
         enableEdgeToEdge()
         setContent {
             ShadowMemoirTheme {
                 val navController = rememberNavController()
-                AppNavHost(navController, onboardingRequired)
+                AppNavHost(navController, hasCredentials = hasCredentials, isSignedIn = isSignedIn)
             }
         }
     }

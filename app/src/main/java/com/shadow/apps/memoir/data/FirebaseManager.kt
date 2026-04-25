@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,7 +30,6 @@ class FirebaseManager @Inject constructor(@param:ApplicationContext private val 
             .build()
 
         FirebaseApp.initializeApp(context, options, APP_NAME)
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
     }
 
     fun isInitialised(): Boolean =
