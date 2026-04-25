@@ -21,7 +21,7 @@
     <string name="getting_started_feature_patterns_desc">See how sleep shapes spend, mood shapes work.</string>
 
     <!-- Device type selection screen (Setup 1 of 3) -->
-    <string name="device_type_setup_step">SETUP · 1 OF 3</string>
+    <string name="device_type_setup_step">SETUP \u00B7 1 OF 3</string>
     <string name="device_type_headline">Is this your first device?</string>
     <string name="device_type_subtitle">Your Firebase project is the single source of truth for all Shadow Memoir data. Set one up now, or pair with an existing one.</string>
     <string name="device_type_primary_title">Set up a new vault</string>
@@ -32,7 +32,7 @@
     <string name="device_type_secondary_desc">Scan the QR code from your primary device to copy its config instantly.</string>
 
     <!-- Firebase Setup screen (Setup 2 of 3 — Primary) -->
-    <string name="firebase_setup_step">SETUP · 2 OF 3 · PRIMARY</string>
+    <string name="firebase_setup_step">SETUP \u00B7 2 OF 3 \u00B7 PRIMARY</string>
     <string name="firebase_setup_headline">Connect your\nFirebase project</string>
     <string name="firebase_setup_subtitle">Upload your config file or enter the fields manually. We store these in EncryptedSharedPreferences.</string>
     <string name="firebase_setup_upload_title">Upload google-services.json</string>
@@ -47,7 +47,7 @@
     <string name="firebase_setup_continue">Continue</string>
 
     <!-- Scan QR screen (Setup 2 of 3 — Secondary) -->
-    <string name="scan_qr_step">SETUP · 2 OF 3 · SECONDARY</string>
+    <string name="scan_qr_step">SETUP \u00B7 2 OF 3 \u00B7 SECONDARY</string>
     <string name="scan_qr_headline">Point your\ncamera at the QR</string>
     <string name="scan_qr_subtitle">On your primary device, open Settings → Devices → Share config.</string>
     <string name="scan_qr_looking">Looking for code…</string>
@@ -67,4 +67,20 @@
     <string name="sign_in_security_prefix">Credentials stored in </string>
     <string name="sign_in_security_bold">Android Keystore</string>
     <string name="sign_in_security_suffix">. Your session token never leaves the device.</string>
+
+    <!-- Device Setup screen (Setup — Almost done) -->
+    <string name="device_setup_step">ALMOST DONE</string>
+    <string name="device_setup_headline">A few preferences</string>
+    <string name="device_setup_subtitle">Set how this device identifies itself.</string>
+    <string name="device_setup_device_name_label">DEVICE NAME</string>
+    <string name="device_setup_primary_title">Use as primary device</string>
+    <string name="device_setup_primary_desc">Polls health data and fires reminder notifications.</string>
+    <string name="device_setup_currency_label">DISPLAY CURRENCY</string>
+    <string name="device_setup_finish">Finish setup</string>
+
+    <!-- Setup Complete screen -->
+    <string name="setup_complete_label">SETUP COMPLETE</string>
+    <string name="setup_complete_headline">You\'re all set.</string>
+    <string name="setup_complete_subtitle">Shadow Memoir is ready. Your data is private, encrypted, and stored in your own Firebase project.</string>
+    <string name="setup_complete_cta">Enter Shadow Memoir</string>
 </resources>

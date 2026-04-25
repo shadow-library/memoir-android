@@ -27,11 +27,17 @@ class MainActivity : ComponentActivity() {
         /** Evaluated once here — stable across recompositions, no side-effects in setContent. */
         val hasCredentials = configStore.hasFirebaseCredentials()
         val isSignedIn = firebaseManager.isInitialised() && firebaseManager.auth().currentUser != null
+        val hasCompletedSetup = configStore.hasCompletedSetup()
         enableEdgeToEdge()
         setContent {
             ShadowMemoirTheme {
                 val navController = rememberNavController()
-                AppNavHost(navController, hasCredentials = hasCredentials, isSignedIn = isSignedIn)
+                AppNavHost(
+                    navController = navController,
+                    hasCredentials = hasCredentials,
+                    isSignedIn = isSignedIn,
+                    hasCompletedSetup = hasCompletedSetup,
+                )
             }
         }
     }

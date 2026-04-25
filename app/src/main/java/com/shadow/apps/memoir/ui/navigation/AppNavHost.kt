@@ -5,10 +5,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.shadow.apps.memoir.ui.home.HomeScreen
+import com.shadow.apps.memoir.ui.onboarding.DeviceSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.DeviceTypeScreen
 import com.shadow.apps.memoir.ui.onboarding.FirebaseSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.GettingStartedScreen
 import com.shadow.apps.memoir.ui.onboarding.ScanQrScreen
+import com.shadow.apps.memoir.ui.onboarding.SetupCompleteScreen
 import com.shadow.apps.memoir.ui.onboarding.SignInScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
@@ -16,7 +18,12 @@ import com.shadow.apps.memoir.ui.splash.SplashScreen
  * Single navigation graph for the entire app.
  */
 @Composable
-fun AppNavHost(navController: NavHostController, hasCredentials: Boolean, isSignedIn: Boolean) {
+fun AppNavHost(
+    navController: NavHostController,
+    hasCredentials: Boolean,
+    isSignedIn: Boolean,
+    hasCompletedSetup: Boolean,
+) {
 
     NavHost(navController = navController, startDestination = Splash) {
 
@@ -30,6 +37,7 @@ fun AppNavHost(navController: NavHostController, hasCredentials: Boolean, isSign
                 val dest: Any = when {
                     !hasCredentials -> GettingStarted
                     !isSignedIn -> SignIn
+                    !hasCompletedSetup -> DeviceSetup
                     else -> Home
                 }
                 navController.navigate(dest) {
@@ -97,8 +105,41 @@ fun AppNavHost(navController: NavHostController, hasCredentials: Boolean, isSign
                     }
                 },
                 onContinue = {
+                    if (hasCompletedSetup) {
+                        navController.navigate(Home) {
+                            popUpTo<SignIn> { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(DeviceSetup) {
+                            popUpTo<SignIn> { inclusive = true }
+                        }
+                    }
+                },
+            )
+        }
+
+        composable<DeviceSetup> {
+            DeviceSetupScreen(
+                onBack = {
+                    if (!navController.popBackStack()) {
+                        navController.navigate(SignIn) {
+                            popUpTo<DeviceSetup> { inclusive = true }
+                        }
+                    }
+                },
+                onContinue = {
+                    navController.navigate(SetupComplete) {
+                        popUpTo<GettingStarted> { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable<SetupComplete> {
+            SetupCompleteScreen(
+                onContinue = {
                     navController.navigate(Home) {
-                        popUpTo<SignIn> { inclusive = true }
+                        popUpTo<SetupComplete> { inclusive = true }
                     }
                 },
             )
