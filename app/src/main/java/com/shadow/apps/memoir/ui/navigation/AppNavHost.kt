@@ -4,26 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.shadow.apps.memoir.domain.model.StartupDestination
 import com.shadow.apps.memoir.ui.home.HomeScreen
-import com.shadow.apps.memoir.ui.onboarding.DeviceSetupScreen
-import com.shadow.apps.memoir.ui.onboarding.DeviceTypeScreen
-import com.shadow.apps.memoir.ui.onboarding.FirebaseSetupScreen
-import com.shadow.apps.memoir.ui.onboarding.GettingStartedScreen
-import com.shadow.apps.memoir.ui.onboarding.ScanQrScreen
-import com.shadow.apps.memoir.ui.onboarding.SetupCompleteScreen
-import com.shadow.apps.memoir.ui.onboarding.SignInScreen
+import com.shadow.apps.memoir.ui.onboarding.devicesetup.DeviceSetupScreen
+import com.shadow.apps.memoir.ui.onboarding.devicetype.DeviceTypeScreen
+import com.shadow.apps.memoir.ui.onboarding.firebasesetup.FirebaseSetupScreen
+import com.shadow.apps.memoir.ui.onboarding.gettingstarted.GettingStartedScreen
+import com.shadow.apps.memoir.ui.onboarding.scanqr.ScanQrScreen
+import com.shadow.apps.memoir.ui.onboarding.setupcomplete.SetupCompleteScreen
+import com.shadow.apps.memoir.ui.onboarding.signin.SignInScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
 /**
  * Single navigation graph for the entire app.
  */
 @Composable
-fun AppNavHost(
-    navController: NavHostController,
-    hasCredentials: Boolean,
-    isSignedIn: Boolean,
-    hasCompletedSetup: Boolean,
-) {
+fun AppNavHost(navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = Splash) {
 
@@ -33,12 +29,12 @@ fun AppNavHost(
          * to the splash screen after it completes.
          */
         composable<Splash> {
-            SplashScreen(onSplashComplete = {
-                val dest: Any = when {
-                    !hasCredentials -> GettingStarted
-                    !isSignedIn -> SignIn
-                    !hasCompletedSetup -> DeviceSetup
-                    else -> Home
+            SplashScreen(onSplashComplete = { destination ->
+                val dest: Any = when (destination) {
+                    StartupDestination.GettingStarted -> GettingStarted
+                    StartupDestination.SignIn -> SignIn
+                    StartupDestination.DeviceSetup -> DeviceSetup
+                    StartupDestination.Home -> Home
                 }
                 navController.navigate(dest) {
                     popUpTo<Splash> { inclusive = true }
@@ -104,15 +100,15 @@ fun AppNavHost(
                         }
                     }
                 },
-                onContinue = {
-                    if (hasCompletedSetup) {
-                        navController.navigate(Home) {
-                            popUpTo<SignIn> { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(DeviceSetup) {
-                            popUpTo<SignIn> { inclusive = true }
-                        }
+                onContinue = { destination ->
+                    val dest: Any = when (destination) {
+                        StartupDestination.GettingStarted -> GettingStarted
+                        StartupDestination.SignIn -> SignIn
+                        StartupDestination.DeviceSetup -> DeviceSetup
+                        StartupDestination.Home -> Home
+                    }
+                    navController.navigate(dest) {
+                        popUpTo<SignIn> { inclusive = true }
                     }
                 },
             )
