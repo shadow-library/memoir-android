@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.shadow.apps.memoir.ui.home.HomeScreen
 import com.shadow.apps.memoir.ui.onboarding.DeviceTypeScreen
+import com.shadow.apps.memoir.ui.onboarding.FirebaseSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.GettingStartedScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
@@ -42,13 +43,21 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
         composable<DeviceType> {
             DeviceTypeScreen(
                 onBack = { navController.popBackStack() },
-                /** TODO: swap stubs for FirebaseSetup / ScanQr once those screens exist. */
-                onSetupNewVault = {
+                onSetupNewVault = { navController.navigate(FirebaseSetup) },
+                /** TODO: swap stub for ScanQr once that screen exists. */
+                onPairExistingVault = {
                     navController.navigate(Home) {
                         popUpTo<Splash> { inclusive = true }
                     }
                 },
-                onPairExistingVault = {
+            )
+        }
+
+        composable<FirebaseSetup> {
+            FirebaseSetupScreen(
+                onBack = { navController.popBackStack() },
+                /** TODO: navigate to SignIn once that screen is implemented. */
+                onContinue = {
                     navController.navigate(Home) {
                         popUpTo<Splash> { inclusive = true }
                     }

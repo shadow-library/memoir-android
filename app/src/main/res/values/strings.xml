@@ -30,4 +30,19 @@
     <string name="device_type_secondary_title">Pair with existing vault</string>
     <string name="device_type_secondary_badge">SECONDARY DEVICE</string>
     <string name="device_type_secondary_desc">Scan the QR code from your primary device to copy its config instantly.</string>
+
+    <!-- Firebase Setup screen (Setup 2 of 3 — Primary) -->
+    <string name="firebase_setup_step">SETUP · 2 OF 3 · PRIMARY</string>
+    <string name="firebase_setup_headline">Connect your\nFirebase project</string>
+    <string name="firebase_setup_subtitle">Upload your config file or enter the fields manually. We store these in EncryptedSharedPreferences.</string>
+    <string name="firebase_setup_upload_title">Upload google-services.json</string>
+    <string name="firebase_setup_upload_desc">Pick the file downloaded from your Firebase console</string>
+    <string name="firebase_setup_or_manual">or enter manually</string>
+    <string name="firebase_setup_hint">Don\'t have one yet? Create a project at console.firebase.google.com → enable Firestore + Google Auth → copy the config from Project Settings.</string>
+    <string name="firebase_setup_field_project_id">Project ID</string>
+    <string name="firebase_setup_field_api_key">API Key</string>
+    <string name="firebase_setup_field_app_id">App ID</string>
+    <string name="firebase_setup_field_storage_bucket">Storage Bucket</string>
+    <string name="firebase_setup_field_database_url">Database URL (optional)</string>
+    <string name="firebase_setup_continue">Continue</string>
 </resources>
