@@ -6,6 +6,7 @@ data class FirebaseSetupUiState(
     val appId: String = "",
     val storageBucket: String = "",
     val databaseUrl: String = "",
+    val webClientId: String = "",
     val uploadError: String? = null,
     val isSaving: Boolean = false,
 ) {

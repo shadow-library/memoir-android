@@ -30,6 +30,7 @@ class ScanQrViewModel @Inject constructor(private val configStore: EncryptedConf
                     appId = creds.appId,
                     storageBucket = creds.storageBucket,
                     databaseUrl = creds.databaseUrl ?: "",
+                    webClientId = creds.webClientId ?: "",
                     error = null,
                 )
             }
@@ -48,6 +49,7 @@ class ScanQrViewModel @Inject constructor(private val configStore: EncryptedConf
             apiKey = state.apiKey.trim(),
             storageBucket = state.storageBucket.trim(),
             databaseUrl = state.databaseUrl.trim().takeIf { it.isNotBlank() },
+            webClientId = state.webClientId.trim().takeIf { it.isNotBlank() },
         )
         _uiState.update { it.copy(isSaving = false) }
         onSuccess()
@@ -58,9 +60,9 @@ class ScanQrViewModel @Inject constructor(private val configStore: EncryptedConf
      *
      * Expected format (compact keys to keep QR small):
      * ```json
-     * {"p":"project-id","k":"api-key","a":"app-id","s":"storage-bucket","d":"database-url"}
+     * {"p":"project-id","k":"api-key","a":"app-id","s":"storage-bucket","d":"database-url","w":"web-client-id"}
      * ```
-     * The `d` (databaseUrl) field is optional.
+     * The `d` (databaseUrl) and `w` (webClientId) fields are optional.
      */
     private fun parseQrPayload(json: String): FirebaseCredentials? = runCatching {
         val root = JSONObject(json)
@@ -77,6 +79,7 @@ class ScanQrViewModel @Inject constructor(private val configStore: EncryptedConf
             apiKey = apiKey,
             storageBucket = storageBucket,
             databaseUrl = root.optString("d").takeIf { it.isNotBlank() },
+            webClientId = root.optString("w").takeIf { it.isNotBlank() },
         )
     }.getOrNull()
 }

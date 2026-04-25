@@ -9,6 +9,7 @@ data class ScanQrUiState(
     val appId: String = "",
     val storageBucket: String = "",
     val databaseUrl: String = "",
+    val webClientId: String = "",
     val error: String? = null,
     val isSaving: Boolean = false,
 ) {

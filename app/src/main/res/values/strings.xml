@@ -56,4 +56,15 @@
     <string name="scan_qr_continue">Continue</string>
     <string name="scan_qr_enter_manually">Enter manually instead</string>
     <string name="scan_qr_camera_needed">Camera access is needed\nto scan the QR code</string>
+
+    <!-- Sign In screen (Setup 3 of 3 — Auth) -->
+    <string name="sign_in_step">SETUP \u00B7 3 OF 3 \u00B7 AUTH</string>
+    <string name="sign_in_headline">Sign in to your vault</string>
+    <string name="sign_in_subtitle">Use the Google account that owns this Firebase project. Rules are scoped to your UID \u2014 nobody else can read or write.</string>
+    <string name="sign_in_firebase_label">FIREBASE PROJECT</string>
+    <string name="sign_in_connected">Connected</string>
+    <string name="sign_in_google_button">Continue with Google</string>
+    <string name="sign_in_security_prefix">Credentials stored in </string>
+    <string name="sign_in_security_bold">Android Keystore</string>
+    <string name="sign_in_security_suffix">. Your session token never leaves the device.</string>
 </resources>
