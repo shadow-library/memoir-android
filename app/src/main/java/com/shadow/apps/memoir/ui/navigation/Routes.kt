@@ -15,8 +15,9 @@ import kotlinx.serialization.Serializable
 
 /** ── Device setup ────────────────────────────────────────────────────────── */
 
-@Serializable object GenerateQr
 @Serializable object ScanQr
+@Serializable object DeviceSetup
+@Serializable object SetupComplete
 
 /** ── Main app ────────────────────────────────────────────────────────────── */
 

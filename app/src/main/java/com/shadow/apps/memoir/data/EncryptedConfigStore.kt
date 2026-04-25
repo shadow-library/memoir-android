@@ -33,6 +33,10 @@ class EncryptedConfigStore @Inject constructor(@ApplicationContext context: Cont
         const val KEY_STORAGE_BUCKET = "firebase_storage_bucket"
         const val KEY_DATABASE_URL = "firebase_database_url"
         const val KEY_WEB_CLIENT_ID = "firebase_web_client_id"
+        const val KEY_DEVICE_ID = "device_id"
+        const val KEY_DEVICE_NAME = "device_name"
+        const val KEY_IS_PRIMARY = "device_is_primary"
+        const val KEY_HAS_COMPLETED_SETUP = "has_completed_setup"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE)
@@ -108,4 +112,27 @@ class EncryptedConfigStore @Inject constructor(@ApplicationContext context: Cont
     }
 
     fun hasFirebaseCredentials(): Boolean = prefs.getString(KEY_PROJECT_ID, null) != null
+
+    fun saveDeviceIdentity(
+        deviceId: String,
+        deviceName: String,
+        isPrimary: Boolean,
+        hasCompletedSetup: Boolean,
+    ) {
+        prefs.edit {
+            putString(KEY_DEVICE_ID, encrypt(deviceId))
+            putString(KEY_DEVICE_NAME, encrypt(deviceName))
+            putString(KEY_IS_PRIMARY, encrypt(isPrimary.toString()))
+            putString(KEY_HAS_COMPLETED_SETUP, encrypt(hasCompletedSetup.toString()))
+        }
+    }
+
+    fun loadDeviceId(): String? =
+        prefs.getString(KEY_DEVICE_ID, null)?.let { decrypt(it) }
+
+    fun loadDeviceIsPrimary(): Boolean =
+        prefs.getString(KEY_IS_PRIMARY, null)?.let { decrypt(it) } == "true"
+
+    fun hasCompletedSetup(): Boolean =
+        prefs.getString(KEY_HAS_COMPLETED_SETUP, null)?.let { decrypt(it) } == "true"
 }

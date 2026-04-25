@@ -104,10 +104,11 @@ graph TB
 
 ### Firestore Collection Structure
 
+The profile fields (`uid`, `primaryDeviceId`, `defaultCurrency`, `devices`, `createdAt`) are stored directly on the user document at `users/{uid}`. Subcollections hang off the same document.
+
 ```mermaid
 graph LR
-    U["/users/{uid}"]
-    U --> PRO["profile"]
+    U["/users/{uid} ← profile document"]
     U --> EXP["/expenses/{id}"]
     U --> HLT["/health/{id}"]
     U --> ACT["/actions"]
@@ -553,6 +554,10 @@ Stored at `/users/{uid}/analytics/monthly/2025-03`. **Read-only from the app.** 
 ---
 
 ### Entity: Profile
+
+Stored at `users/{uid}` (the user document is the profile document; subcollections branch off it).
+
+`deviceId` on Android is `Settings.Secure.ANDROID_ID`, cached locally in `EncryptedSharedPreferences` after Device Setup completes. Workers read `primaryDeviceId` from the Firestore offline cache before firing.
 
 ```json
 {

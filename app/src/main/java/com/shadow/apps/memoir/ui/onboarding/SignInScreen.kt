@@ -95,7 +95,6 @@ private fun SignInContent(
             .fillMaxSize()
             .then(background),
     ) {
-        // ── Scrollable content area ────────────────────────────────────
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -103,7 +102,6 @@ private fun SignInContent(
         ) {
             Spacer(Modifier.height(48.dp))
 
-            // Back button
             Row(
                 modifier = Modifier.padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -128,7 +126,6 @@ private fun SignInContent(
 
             Spacer(Modifier.height(20.dp))
 
-            // Step label
             Text(
                 text = stringResource(R.string.sign_in_step),
                 style = MaterialTheme.typography.labelSmall,
@@ -138,7 +135,6 @@ private fun SignInContent(
 
             Spacer(Modifier.height(8.dp))
 
-            // Headline
             Text(
                 text = stringResource(R.string.sign_in_headline),
                 style = MaterialTheme.typography.displaySmall,
@@ -148,7 +144,6 @@ private fun SignInContent(
 
             Spacer(Modifier.height(12.dp))
 
-            // Subtitle
             Text(
                 text = stringResource(R.string.sign_in_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
@@ -157,13 +152,11 @@ private fun SignInContent(
 
             Spacer(Modifier.height(24.dp))
 
-            // Firebase project card
             FirebaseProjectCard(
                 projectId = uiState.projectId,
                 isDark = isDark,
             )
 
-            // Error message
             if (uiState.error != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(
@@ -174,12 +167,10 @@ private fun SignInContent(
             }
         }
 
-        // ── Footer ─────────────────────────────────────────────────────
         Column(
             modifier = Modifier.padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Continue with Google button
             GoogleSignInButton(
                 onClick = onSignIn,
                 isLoading = uiState.isSigningIn,
@@ -188,7 +179,6 @@ private fun SignInContent(
 
             Spacer(Modifier.height(16.dp))
 
-            // Security note
             SecurityNote(isDark = isDark)
 
             Spacer(Modifier.height(20.dp))
@@ -213,7 +203,6 @@ private fun FirebaseProjectCard(projectId: String, isDark: Boolean) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Firebase icon
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -246,7 +235,6 @@ private fun FirebaseProjectCard(projectId: String, isDark: Boolean) {
                 )
             }
 
-            // Connected badge
             Surface(
                 shape = RoundedCornerShape(50),
                 color = Emerald500.copy(alpha = 0.12f),
@@ -344,8 +332,6 @@ private fun SecurityNote(isDark: Boolean) {
     }
 }
 
-
-// ── Previews ────────────────────────────────────────────────────────────────
 
 @Preview(name = "SignIn – Light", showBackground = true, showSystemUi = true)
 @Composable
