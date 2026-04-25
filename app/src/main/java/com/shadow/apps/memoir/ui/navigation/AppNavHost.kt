@@ -8,6 +8,7 @@ import com.shadow.apps.memoir.ui.home.HomeScreen
 import com.shadow.apps.memoir.ui.onboarding.DeviceTypeScreen
 import com.shadow.apps.memoir.ui.onboarding.FirebaseSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.GettingStartedScreen
+import com.shadow.apps.memoir.ui.onboarding.ScanQrScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
 /**
@@ -44,12 +45,7 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
             DeviceTypeScreen(
                 onBack = { navController.popBackStack() },
                 onSetupNewVault = { navController.navigate(FirebaseSetup) },
-                /** TODO: swap stub for ScanQr once that screen exists. */
-                onPairExistingVault = {
-                    navController.navigate(Home) {
-                        popUpTo<Splash> { inclusive = true }
-                    }
-                },
+                onPairExistingVault = { navController.navigate(ScanQr) },
             )
         }
 
@@ -62,6 +58,18 @@ fun AppNavHost(navController: NavHostController, onboardingRequired: Boolean) {
                         popUpTo<Splash> { inclusive = true }
                     }
                 },
+            )
+        }
+
+        composable<ScanQr> {
+            ScanQrScreen(
+                onBack = { navController.popBackStack() },
+                onContinue = {
+                    navController.navigate(Home) {
+                        popUpTo<Splash> { inclusive = true }
+                    }
+                },
+                onEnterManually = { navController.navigate(FirebaseSetup) },
             )
         }
 

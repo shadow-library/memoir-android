@@ -45,4 +45,15 @@
     <string name="firebase_setup_field_storage_bucket">Storage Bucket</string>
     <string name="firebase_setup_field_database_url">Database URL (optional)</string>
     <string name="firebase_setup_continue">Continue</string>
+
+    <!-- Scan QR screen (Setup 2 of 3 — Secondary) -->
+    <string name="scan_qr_step">SETUP · 2 OF 3 · SECONDARY</string>
+    <string name="scan_qr_headline">Point your\ncamera at the QR</string>
+    <string name="scan_qr_subtitle">On your primary device, open Settings → Devices → Share config.</string>
+    <string name="scan_qr_looking">Looking for code…</string>
+    <string name="scan_qr_all_fields">All four fields auto-populated.</string>
+    <string name="scan_qr_config_received">Config received</string>
+    <string name="scan_qr_continue">Continue</string>
+    <string name="scan_qr_enter_manually">Enter manually instead</string>
+    <string name="scan_qr_camera_needed">Camera access is needed\nto scan the QR code</string>
 </resources>
