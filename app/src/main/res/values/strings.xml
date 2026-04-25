@@ -2,18 +2,32 @@
     <string name="app_name">Shadow Memoir</string>
     <string name="splash_tagline">Your personal operating system</string>
 
-    <!-- Onboarding screen -->
-    <string name="onboarding_welcome_label">WELCOME</string>
-    <string name="onboarding_headline">One quiet place for your spending, body, habits, and thoughts.</string>
-    <string name="onboarding_subtitle">Your data lives in your Firebase — no shared backend, no account with us.</string>
-    <string name="onboarding_cta">Get started</string>
+    <!-- General navigation -->
+    <string name="back">Back</string>
 
-    <string name="onboarding_feature_expenses_label">Expenses &amp; subscriptions</string>
-    <string name="onboarding_feature_expenses_desc">Manual or AI-assisted, in INR or any currency.</string>
-    <string name="onboarding_feature_health_label">Health &amp; wearables</string>
-    <string name="onboarding_feature_health_desc">Sleep, HR, steps — Galaxy Fit or Apple Watch.</string>
-    <string name="onboarding_feature_diary_label">Actions &amp; diary</string>
-    <string name="onboarding_feature_diary_desc">Mood-logged journal entries.</string>
-    <string name="onboarding_feature_patterns_label">Patterns across life</string>
-    <string name="onboarding_feature_patterns_desc">See how sleep shapes spend, mood shapes work.</string>
+    <!-- Getting Started screen -->
+    <string name="getting_started_welcome_label">WELCOME</string>
+    <string name="getting_started_headline">One quiet place for your spending, body, habits, and thoughts.</string>
+    <string name="getting_started_subtitle">Your data lives in your Firebase — no shared backend, no account with us.</string>
+    <string name="getting_started_cta">Get started</string>
+
+    <string name="getting_started_feature_expenses_label">Expenses &amp; subscriptions</string>
+    <string name="getting_started_feature_expenses_desc">Manual or AI-assisted, in INR or any currency.</string>
+    <string name="getting_started_feature_health_label">Health &amp; wearables</string>
+    <string name="getting_started_feature_health_desc">Sleep, HR, steps — Galaxy Fit or Apple Watch.</string>
+    <string name="getting_started_feature_diary_label">Actions &amp; diary</string>
+    <string name="getting_started_feature_diary_desc">Mood-logged journal entries.</string>
+    <string name="getting_started_feature_patterns_label">Patterns across life</string>
+    <string name="getting_started_feature_patterns_desc">See how sleep shapes spend, mood shapes work.</string>
+
+    <!-- Device type selection screen (Setup 1 of 3) -->
+    <string name="device_type_setup_step">SETUP · 1 OF 3</string>
+    <string name="device_type_headline">Is this your first device?</string>
+    <string name="device_type_subtitle">Your Firebase project is the single source of truth for all Shadow Memoir data. Set one up now, or pair with an existing one.</string>
+    <string name="device_type_primary_title">Set up a new vault</string>
+    <string name="device_type_primary_badge">PRIMARY DEVICE</string>
+    <string name="device_type_primary_desc">Create or paste a Firebase config. This device will write health data and send reminder notifications.</string>
+    <string name="device_type_secondary_title">Pair with existing vault</string>
+    <string name="device_type_secondary_badge">SECONDARY DEVICE</string>
+    <string name="device_type_secondary_desc">Scan the QR code from your primary device to copy its config instantly.</string>
 </resources>

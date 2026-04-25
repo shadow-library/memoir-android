@@ -4,7 +4,6 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shadow.apps.memoir.R
+import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan1
 import com.shadow.apps.memoir.ui.theme.Cyan5
 import com.shadow.apps.memoir.ui.theme.Cyan6
@@ -55,8 +55,6 @@ import com.shadow.apps.memoir.ui.theme.Terracotta5
 import com.shadow.apps.memoir.ui.theme.Violet200
 import com.shadow.apps.memoir.ui.theme.Violet500
 
-// ── Private types ──────────────────────────────────────────────────────────────
-
 private data class FeatureItem(
     val icon: ImageVector,
     val iconBg: Color,
@@ -65,17 +63,15 @@ private data class FeatureItem(
     val description: String,
 )
 
-// ── Public screen ──────────────────────────────────────────────────────────────
-
 /**
- * First-launch onboarding screen that introduces the four core modules.
+ * Getting Started screen that introduces the four core modules.
  *
  * @param onGetStarted Called when the user taps the primary CTA. The host
  *   (MainActivity) is responsible for persisting the "onboarding complete" flag
  *   before navigating away.
  */
 @Composable
-fun OnboardingScreen(onGetStarted: () -> Unit) {
+fun GettingStartedScreen(onGetStarted: () -> Unit) {
     val isDark = isSystemInDarkTheme()
 
     val background = if (isDark) {
@@ -84,46 +80,42 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
         Modifier.background(Slate0)
     }
 
-    // Feature rows — strings resolved at composition time, no I/O involved
     val features = listOf(
         FeatureItem(
             icon = Icons.Outlined.AccountBalanceWallet,
             iconBg = Cyan1,
             iconTint = Cyan6,
-            label = stringResource(R.string.onboarding_feature_expenses_label),
-            description = stringResource(R.string.onboarding_feature_expenses_desc),
+            label = stringResource(R.string.getting_started_feature_expenses_label),
+            description = stringResource(R.string.getting_started_feature_expenses_desc),
         ),
         FeatureItem(
             icon = Icons.Outlined.MonitorHeart,
             iconBg = Emerald200,
             iconTint = Emerald500,
-            label = stringResource(R.string.onboarding_feature_health_label),
-            description = stringResource(R.string.onboarding_feature_health_desc),
+            label = stringResource(R.string.getting_started_feature_health_label),
+            description = stringResource(R.string.getting_started_feature_health_desc),
         ),
         FeatureItem(
             icon = Icons.Outlined.AutoStories,
             iconBg = Terracotta1,
             iconTint = Terracotta5,
-            label = stringResource(R.string.onboarding_feature_diary_label),
-            description = stringResource(R.string.onboarding_feature_diary_desc),
+            label = stringResource(R.string.getting_started_feature_diary_label),
+            description = stringResource(R.string.getting_started_feature_diary_desc),
         ),
         FeatureItem(
             icon = Icons.Outlined.Insights,
             iconBg = Violet200,
             iconTint = Violet500,
-            label = stringResource(R.string.onboarding_feature_patterns_label),
-            description = stringResource(R.string.onboarding_feature_patterns_desc),
+            label = stringResource(R.string.getting_started_feature_patterns_label),
+            description = stringResource(R.string.getting_started_feature_patterns_desc),
         ),
     )
 
-    // Outer Column is non-scrollable so that weight() works to pin the CTA at the
-    // bottom. The inner Column is scrollable to handle smaller-screen devices.
     Column(
         modifier = Modifier
             .fillMaxSize()
             .then(background),
     ) {
-        // ── Scrollable content ─────────────────────────────────────────────────
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -132,9 +124,8 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
         ) {
             Spacer(Modifier.height(56.dp))
 
-            // "WELCOME" eyebrow label
             Text(
-                text = stringResource(R.string.onboarding_welcome_label),
+                text = stringResource(R.string.getting_started_welcome_label),
                 style = MaterialTheme.typography.labelSmall,
                 letterSpacing = 3.sp,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
@@ -142,11 +133,11 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
 
             Spacer(Modifier.height(12.dp))
 
-            // App logo + name, side by side
             Row(verticalAlignment = Alignment.CenterVertically) {
+                /** Decorative icon; the app name follows in the adjacent Text. */
                 Image(
                     painter = painterResource(R.drawable.ic_memoir_logo),
-                    contentDescription = null, // decorative — name follows in text
+                    contentDescription = null,
                     modifier = Modifier.size(28.dp),
                 )
                 Spacer(Modifier.size(8.dp))
@@ -160,9 +151,8 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
 
             Spacer(Modifier.height(36.dp))
 
-            // Primary headline
             Text(
-                text = stringResource(R.string.onboarding_headline),
+                text = stringResource(R.string.getting_started_headline),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -170,9 +160,8 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
 
             Spacer(Modifier.height(12.dp))
 
-            // Supporting subtitle
             Text(
-                text = stringResource(R.string.onboarding_subtitle),
+                text = stringResource(R.string.getting_started_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
             )
@@ -187,12 +176,11 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
             Spacer(Modifier.height(24.dp))
         }
 
-        // ── Pinned bottom section ──────────────────────────────────────────────
         Column(
             modifier = Modifier.padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            PageDots(total = 3, current = 0)
+            PageDots(total = 5, current = 0)
 
             Spacer(Modifier.height(24.dp))
 
@@ -205,7 +193,7 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = Cyan5),
             ) {
                 Text(
-                    text = stringResource(R.string.onboarding_cta),
+                    text = stringResource(R.string.getting_started_cta),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -216,12 +204,9 @@ fun OnboardingScreen(onGetStarted: () -> Unit) {
     }
 }
 
-// ── Private composables ────────────────────────────────────────────────────────
-
 @Composable
 private fun FeatureRow(item: FeatureItem) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        // Coloured icon badge
         Box(
             modifier = Modifier
                 .size(44.dp)
@@ -230,7 +215,7 @@ private fun FeatureRow(item: FeatureItem) {
         ) {
             Icon(
                 imageVector = item.icon,
-                contentDescription = item.label, // announces feature name to screen readers
+                contentDescription = item.label,
                 tint = item.iconTint,
                 modifier = Modifier.size(22.dp),
             )
@@ -255,52 +240,27 @@ private fun FeatureRow(item: FeatureItem) {
     }
 }
 
-@Composable
-private fun PageDots(total: Int, current: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-    ) {
-        repeat(total) { index ->
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .background(
-                        color = if (index == current) {
-                            Cyan5
-                        } else {
-                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.20f)
-                        },
-                        shape = CircleShape,
-                    ),
-            )
-        }
-    }
-}
-
-// ── Previews ───────────────────────────────────────────────────────────────────
-
 @Preview(
-    name = "Onboarding – Light",
+    name = "Getting Started – Light",
     showBackground = true,
     showSystemUi = true,
 )
 @Composable
-private fun OnboardingLightPreview() {
+private fun GettingStartedLightPreview() {
     ShadowMemoirTheme(darkTheme = false) {
-        OnboardingScreen(onGetStarted = {})
+        GettingStartedScreen(onGetStarted = {})
     }
 }
 
 @Preview(
-    name = "Onboarding – Dark",
+    name = "Getting Started – Dark",
     showBackground = true,
     showSystemUi = true,
     uiMode = UI_MODE_NIGHT_YES,
 )
 @Composable
-private fun OnboardingDarkPreview() {
+private fun GettingStartedDarkPreview() {
     ShadowMemoirTheme(darkTheme = true) {
-        OnboardingScreen(onGetStarted = {})
+        GettingStartedScreen(onGetStarted = {})
     }
 }
