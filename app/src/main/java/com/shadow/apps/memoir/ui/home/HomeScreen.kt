@@ -16,7 +16,7 @@ import com.shadow.apps.memoir.R
  * TODO: Implement the main home screen.
  *
  * This is a placeholder that will be replaced once the home screen design is finalised.
- * Navigation here from [OnboardingScreen] (first launch) or directly on subsequent
+ * Navigation here from [GettingStartedScreen] (first launch) or directly on subsequent
  * launches via the shouldShowOnboarding() check in MainActivity.
  */
 @Composable
