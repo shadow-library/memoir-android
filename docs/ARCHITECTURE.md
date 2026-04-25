@@ -35,7 +35,7 @@
 
 ### Purpose
 
-Shadow Memoir is a native personal life-tracking platform for Android, iOS, and macOS. It serves as a personal operating system — tracking spending, subscriptions, physical health, daily habits, and journal entries in one place, then correlating these across dimensions to surface behavioural insights. All data is privately owned by the user via their own Firebase project; no shared backend exists.
+Shadow Memoir is a native Android personal life-tracking platform. It serves as a personal operating system — tracking spending, subscriptions, physical health, daily habits, and journal entries in one place, then correlating these across dimensions to surface behavioural insights. All data is privately owned by the user via their own Firebase project; no shared backend exists.
 
 ### Core Feature Modules
 
@@ -43,7 +43,7 @@ Shadow Memoir is a native personal life-tracking platform for Android, iOS, and 
 |--------|-------------|
 | Expense Tracking | Manual entry and AI-powered bill scanning, multi-currency, INR display |
 | Subscription Tracking | Pre-paid and recurring subscriptions with two-view monthly budget |
-| Health & Wearables | Sleep, heart rate, steps, workouts from Galaxy Fit 3 / Apple Watch |
+| Health & Wearables | Sleep, heart rate, steps, and workouts from Galaxy Fit 3 via Android Health Connect |
 | Action Tracking | Fully custom user-defined habits and daily activity logs |
 | Diary & Journaling | Multiple daily entries with mood and custom structured tags |
 | Analytics | Month-over-month summaries with cross-module correlations |
@@ -54,9 +54,7 @@ Shadow Memoir is a native personal life-tracking platform for Android, iOS, and 
 
 | Platform | Language | UI | Notes |
 |----------|----------|----|-------|
-| Android | Kotlin | Jetpack Compose | Primary mobile platform |
-| iOS | Swift | SwiftUI | Full feature parity |
-| macOS | Swift | SwiftUI | Mac Catalyst — same iOS codebase, no separate target |
+| Android | Kotlin | Jetpack Compose | Primary and only supported platform |
 
 ---
 
@@ -66,14 +64,12 @@ Shadow Memoir is a native personal life-tracking platform for Android, iOS, and 
 
 ```mermaid
 graph TB
-    subgraph Clients["Client Platforms"]
+    subgraph Clients["Client Platform"]
         AND["Android<br/>Kotlin + Compose"]
-        IOS["iOS + macOS<br/>Swift + SwiftUI<br/>Mac Catalyst"]
     end
 
     subgraph Wearables["Wearables — Primary Device Only"]
         FIT["Samsung Galaxy Fit 3<br/>Android"]
-        AW["Apple Watch<br/>iOS"]
     end
 
     subgraph FS["Cloud Firestore — user-owned project"]
@@ -89,15 +85,10 @@ graph TB
     PY["Python Analytics Pipeline<br/>Manual — run post month-end"]
 
     FIT -- "Health Connect" --> AND
-    AW -- "HealthKit" --> IOS
     AND -- "Read / Write" --> OZ
-    IOS -- "Read / Write" --> OZ
     AND -- "Read only" --> AZ
-    IOS -- "Read only" --> AZ
     AND -- "Receipt image" --> GEMINI
-    IOS -- "Receipt image" --> GEMINI
     AND -- "Daily rate" --> FX
-    IOS -- "Daily rate" --> FX
     OZ -- "Manual export" --> PY
     PY -- "Write results" --> AZ
 ```
@@ -147,24 +138,8 @@ graph LR
 | Health data | Health Connect API |
 | Background tasks | WorkManager |
 | Camera | CameraX |
-| FX rates | Frankfurter.app via Ktor HTTP client |
-| Credential storage | EncryptedSharedPreferences (Jetpack Security / Android Keystore) |
-
-### iOS + macOS (Mac Catalyst)
-
-| Concern | Library / Tool |
-|---------|----------------|
-| Language | Swift |
-| UI | SwiftUI |
-| Database / Sync | Firebase iOS SDK (offline persistence enabled) |
-| Authentication | Firebase Auth + Google Sign-in |
-| Health data | HealthKit — iOS only, guarded by `#if !targetEnvironment(macCatalyst)` |
-| Background tasks | BGTaskScheduler — iOS only |
-| Camera | AVFoundation / PhotosUI |
-| FX rates | Frankfurter.app via URLSession |
-| Credential storage | Keychain Services |
-
-> **macOS via Mac Catalyst:** The iOS app binary runs on macOS with one checkbox in Xcode. Health polling, background tasks, and wearable sync are disabled on the macOS target via compile-time guards. Health data and action reminders are visible read-only via Firestore sync from the iOS primary device.
+| FX rates | Frankfurter.app via Retrofit and OkHttp |
+| Credential storage | App-private SharedPreferences with values encrypted by Android Keystore AES-GCM |
 
 ### Shared / External
 
@@ -557,7 +532,7 @@ Stored at `/users/{uid}/analytics/monthly/2025-03`. **Read-only from the app.** 
 
 Stored at `users/{uid}` (the user document is the profile document; subcollections branch off it).
 
-`deviceId` on Android is `Settings.Secure.ANDROID_ID`, cached locally in `EncryptedSharedPreferences` after Device Setup completes. Workers read `primaryDeviceId` from the Firestore offline cache before firing.
+`deviceId` on Android is `Settings.Secure.ANDROID_ID`, cached locally in Android Keystore-backed secure preferences after Device Setup completes. Workers read `primaryDeviceId` from the Firestore offline cache before firing.
 
 ```json
 {
@@ -638,10 +613,7 @@ Firestore's built-in offline persistence is the sole local data store. No second
 
 ### Credential Encryption
 
-| Platform | Mechanism |
-|----------|-----------|
-| Android | `EncryptedSharedPreferences` backed by Android Keystore (hardware-backed) |
-| iOS / macOS | Keychain Services with `kSecAttrAccessibleAfterFirstUnlock` |
+Firebase project credentials are encrypted with AES-GCM using a key generated and stored in Android Keystore, then persisted in app-private `SharedPreferences`. No raw Firebase configuration values should be written to plain `SharedPreferences`, logs, analytics, crash reports, or unencrypted files.
 
 ### What Is Stored in Secure Storage
 
@@ -662,7 +634,7 @@ Firestore's built-in offline persistence is the sole local data store. No second
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com)
 2. Enable **Cloud Firestore** in production mode
 3. Enable **Authentication** → Google Sign-in provider
-4. Project Settings → add Android / iOS app → note config values
+4. Project Settings → add Android app → note config values
 5. Apply Security Rules below
 
 ### Security Rules
@@ -680,7 +652,6 @@ service cloud.firestore {
 
 ### Dynamic Initialisation
 
-**Android (Kotlin):**
 ```kotlin
 val options = FirebaseOptions.Builder()
     .setProjectId(config.projectId)
@@ -689,15 +660,6 @@ val options = FirebaseOptions.Builder()
     .setStorageBucket(config.storageBucket)
     .build()
 FirebaseApp.initializeApp(context, options)
-```
-
-**iOS / macOS (Swift):**
-```swift
-let options = FirebaseOptions(googleAppID: config.appID, gcmSenderID: config.senderID)
-options.projectID = config.projectID
-options.apiKey = config.apiKey
-options.storageBucket = config.storageBucket
-FirebaseApp.configure(options: options)
 ```
 
 ### Adding a Second Device
@@ -808,32 +770,29 @@ Return ONLY valid JSON with no additional text. Use null for any missing field.
 
 ## 12. Wearable & Health Integration
 
-### Data Sources by Platform
+### Data Source
 
-| Platform | API | Wearable | Writes Health Data |
-|----------|-----|----------|--------------------|
-| Android primary | Health Connect API | Samsung Galaxy Fit 3 via Samsung Health | Yes |
-| iOS primary | HealthKit | Apple Watch | Yes |
-| macOS Catalyst | None | None | No — read-only via Firestore |
-| Any secondary device | None | None | No — health sync skipped |
+| Device Scope | API | Wearable | Writes Health Data |
+|--------------|-----|----------|--------------------|
+| Primary Android device | Health Connect API | Samsung Galaxy Fit 3 via Samsung Health | Yes |
+| Secondary Android device | None | None | No — health sync skipped |
 
 Before each health poll, the device reads `primaryDeviceId` from the cached `profile` document. If it does not match the current device ID, the poll is skipped silently.
 
 ### Data Collected
 
-| Field | Android (Health Connect) | iOS (HealthKit) |
-|-------|--------------------------|-----------------|
-| `sleepHours`, `sleepQuality` | `SleepSessionRecord` | `HKCategoryTypeIdentifierSleepAnalysis` |
-| `avgHeartRate`, `restingHeartRate` | `HeartRateRecord` | `HKQuantityTypeIdentifierHeartRate` |
-| `stepCount` | `StepsRecord` | `HKQuantityTypeIdentifierStepCount` |
-| `activeMinutes` | `ExerciseSessionRecord` | `HKQuantityTypeIdentifierAppleExerciseTime` |
-| `workoutType`, `workoutDurationMinutes` | `ExerciseSessionRecord` | `HKWorkoutType` |
+| Field | Health Connect Source |
+|-------|-----------------------|
+| `sleepHours`, `sleepQuality` | `SleepSessionRecord` |
+| `avgHeartRate`, `restingHeartRate` | `HeartRateRecord` |
+| `stepCount` | `StepsRecord` |
+| `activeMinutes` | `ExerciseSessionRecord` |
+| `workoutType`, `workoutDurationMinutes` | `ExerciseSessionRecord` |
 
 ### Sync Schedule
 
 Polled every **4 hours** on the primary device only:
-- Android: `WorkManager` `PeriodicWorkRequest`
-- iOS: `BGAppRefreshTask`
+- `WorkManager` `PeriodicWorkRequest`
 
 Each poll fetches the prior 24 hours and upserts the `HealthSnapshot` document for that `date`. Repeated polls are idempotent.
 
@@ -890,7 +849,7 @@ flowchart TD
 
 ### Renewal Reminders
 
-The primary device checks all active subscriptions daily via WorkManager / BGTaskScheduler. A reminder notification fires `renewalReminderDaysBefore` days before `nextRenewalDate`. Each subscription configures this independently. The notification prompts the user to decide whether to renew and record the new payment.
+The primary device checks all active subscriptions daily via WorkManager. A reminder notification fires `renewalReminderDaysBefore` days before `nextRenewalDate`. Each subscription configures this independently. The notification prompts the user to decide whether to renew and record the new payment.
 
 ### Renewal Workflow
 
@@ -939,11 +898,7 @@ Diary entries use **last-write-wins**. No version check is performed on write. T
 
 ### Implementation
 
-**Android:** `WorkManager` for scheduling, `NotificationManager` for delivery. Galaxy Fit 3 mirrors all phone notifications via Bluetooth automatically.
-
-**iOS:** `BGTaskScheduler` for scheduling, `UNUserNotificationCenter` for delivery. Apple Watch mirrors all iPhone notifications automatically.
-
-**macOS (Catalyst):** Receives Firestore-triggered conflict notifications via macOS Notification Centre. Scheduled nudges (WorkManager / BGTask) do not fire on macOS.
+`WorkManager` handles scheduling and `NotificationManager` handles delivery. Galaxy Fit 3 mirrors phone notifications via Bluetooth automatically.
 
 ### Primary Device Guard
 
@@ -1014,7 +969,7 @@ pipeline/
 | Health data polling | Deferred — runs when online |
 | FX rate fetch | Uses last in-memory cached rate + warning banner |
 | Conflict resolution | Full — conflict docs are cached |
-| Subscription renewal notifications | Deferred — notification fires when device is online and BGTask runs |
+| Subscription renewal notifications | Deferred — notification fires when device is online and WorkManager runs |
 
 ### Sync Recovery
 
@@ -1024,123 +979,7 @@ On reconnection the Firestore SDK flushes all pending writes in creation order. 
 
 ## 19. Project Structure
 
-### Android
-
-```
-app/
-├── data/
-│   ├── firebase/
-│   │   ├── FirebaseManager.kt
-│   │   ├── ExpenseRepository.kt
-│   │   ├── HealthRepository.kt
-│   │   ├── ActionRepository.kt
-│   │   ├── DiaryRepository.kt
-│   │   ├── SubscriptionRepository.kt
-│   │   ├── AnalyticsRepository.kt
-│   │   └── ConflictRepository.kt
-│   ├── health/
-│   │   └── HealthConnectManager.kt
-│   ├── ai/
-│   │   └── GeminiReceiptParser.kt
-│   ├── fx/
-│   │   └── FxRateService.kt
-│   ├── export/
-│   │   └── ExportManager.kt
-│   └── preferences/
-│       └── EncryptedConfigStore.kt
-├── domain/
-│   ├── model/
-│   │   ├── Expense.kt
-│   │   ├── HealthSnapshot.kt
-│   │   ├── ActionDefinition.kt
-│   │   ├── ActionLog.kt
-│   │   ├── DiaryEntry.kt
-│   │   ├── Subscription.kt
-│   │   └── MonthlyAnalytics.kt
-│   └── usecase/
-│       ├── SaveExpenseUseCase.kt
-│       ├── GetBudgetViewUseCase.kt
-│       ├── GetCashViewUseCase.kt
-│       ├── LogActionUseCase.kt
-│       ├── SaveDiaryEntryUseCase.kt
-│       ├── ResolveConflictUseCase.kt
-│       ├── SyncHealthDataUseCase.kt
-│       └── ComputeVirtualEntriesUseCase.kt
-├── ui/
-│   ├── onboarding/
-│   ├── expenses/
-│   ├── scanner/
-│   ├── subscriptions/
-│   ├── actions/
-│   ├── diary/
-│   ├── analytics/
-│   ├── conflicts/
-│   └── settings/
-├── workers/
-│   ├── HealthSyncWorker.kt
-│   ├── NudgeWorker.kt
-│   ├── ActionReminderWorker.kt
-│   └── SubscriptionRenewalWorker.kt
-└── di/
-    └── AppModule.kt
-```
-
-### iOS + macOS
-
-```
-ShadowMemoir/
-├── Data/
-│   ├── Firebase/
-│   │   ├── FirebaseManager.swift
-│   │   ├── ExpenseRepository.swift
-│   │   ├── HealthRepository.swift
-│   │   ├── ActionRepository.swift
-│   │   ├── DiaryRepository.swift
-│   │   ├── SubscriptionRepository.swift
-│   │   ├── AnalyticsRepository.swift
-│   │   └── ConflictRepository.swift
-│   ├── Health/
-│   │   └── HealthKitManager.swift       # iOS only — #if !targetEnvironment(macCatalyst)
-│   ├── AI/
-│   │   └── GeminiReceiptParser.swift
-│   ├── FX/
-│   │   └── FxRateService.swift
-│   └── Export/
-│       └── ExportManager.swift
-├── Domain/
-│   ├── Models/
-│   │   ├── Expense.swift
-│   │   ├── HealthSnapshot.swift
-│   │   ├── ActionDefinition.swift
-│   │   ├── ActionLog.swift
-│   │   ├── DiaryEntry.swift
-│   │   ├── Subscription.swift
-│   │   └── MonthlyAnalytics.swift
-│   └── UseCases/
-│       ├── SaveExpenseUseCase.swift
-│       ├── GetBudgetViewUseCase.swift
-│       ├── GetCashViewUseCase.swift
-│       ├── LogActionUseCase.swift
-│       ├── SaveDiaryEntryUseCase.swift
-│       ├── ResolveConflictUseCase.swift
-│       ├── SyncHealthDataUseCase.swift
-│       └── ComputeVirtualEntriesUseCase.swift
-├── UI/
-│   ├── Onboarding/
-│   ├── Expenses/
-│   ├── Scanner/
-│   ├── Subscriptions/
-│   ├── Actions/
-│   ├── Diary/
-│   ├── Analytics/
-│   ├── Conflicts/
-│   └── Settings/
-└── BackgroundTasks/
-    ├── HealthSyncTask.swift              # iOS only
-    ├── NudgeTask.swift
-    ├── ActionReminderTask.swift
-    └── SubscriptionRenewalTask.swift
-```
+The mandatory Android package structure, file ownership rules, naming conventions, and block-comment requirements are defined in [DIRECTORY_STRUCTURE.md](./DIRECTORY_STRUCTURE.md). That document is the source of truth for where code belongs.
 
 ### Python Analytics Pipeline
 
@@ -1166,10 +1005,9 @@ The following are explicitly out of scope for v1.0 and should be planned as sepa
 - **Goal tracking per action** — e.g. "code at least 20 days this month" with progress bar
 - **Mood vs spend overlay chart** — visual correlation of diary mood with daily spend
 - **Automated analytics pipeline** — replace manual Python script with Firebase Cloud Function or home-server cron once schema is stable
-- **Apple Watch / Wear OS native companion** — quick expense entry and action logging from wrist
+- **Wear OS native companion** — quick expense entry and action logging from wrist
 - **Web dashboard** — read-only browser analytics view using the same Firestore project
 - **Receipt OCR search history** — store extracted text (not image) to enable past bill search
-- **iCloud backup of Firebase config** — simplified device restoration on iOS
 - **Multi-language support** — localisation beyond English
 - **FX rate audit export** — full history of rates used, for precise accounting reconciliation
 - **Dark mode adaptive charts** — auto-theme all analytics charts to system appearance

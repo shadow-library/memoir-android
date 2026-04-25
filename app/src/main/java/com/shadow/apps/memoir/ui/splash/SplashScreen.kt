@@ -41,7 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.shadow.apps.memoir.R
+import com.shadow.apps.memoir.domain.model.StartupDestination
 import com.shadow.apps.memoir.ui.theme.Cyan5
 import com.shadow.apps.memoir.ui.theme.Cyan6
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
@@ -50,6 +52,7 @@ import com.shadow.apps.memoir.ui.theme.Slate1
 import com.shadow.apps.memoir.ui.theme.Slate8
 import com.shadow.apps.memoir.ui.theme.Slate9
 import kotlinx.coroutines.delay
+import androidx.compose.runtime.collectAsState
 
 // Branded wider tracking for the splash title — intentional departure from headlineLarge's 0.sp.
 private val SplashTitleLetterSpacing = 2.sp
@@ -57,8 +60,32 @@ private val SplashTitleLetterSpacing = 2.sp
 private fun <T> splashAnimSpec(reduceMotion: Boolean): AnimationSpec<T> =
     if (reduceMotion) snap() else tween(durationMillis = 250, easing = FastOutSlowInEasing)
 
+/*
+ * Route
+ *
+ * Displays the branded splash animation, then asks the ViewModel for startup routing.
+ */
 @Composable
-fun SplashScreen(onSplashComplete: () -> Unit) {
+fun SplashScreen(
+    onSplashComplete: (StartupDestination) -> Unit,
+    viewModel: SplashViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.destination) {
+        uiState.destination?.let(onSplashComplete)
+    }
+
+    SplashContent(onAnimationComplete = viewModel::resolveStartupDestination)
+}
+
+/*
+ * Content
+ *
+ * Stateless splash animation content.
+ */
+@Composable
+private fun SplashContent(onAnimationComplete: () -> Unit) {
     val isDarkMode = isSystemInDarkTheme()
     val isInPreview = LocalInspectionMode.current
     var enhanced by remember { mutableStateOf(isInPreview) }
@@ -82,7 +109,7 @@ fun SplashScreen(onSplashComplete: () -> Unit) {
         if (!reduceMotion) delay(100L)
         enhanced = true
         delay(if (reduceMotion) 300L else 500L)
-        onSplashComplete()
+        onAnimationComplete()
     }
 
     val background = if (isDarkMode) Brush.verticalGradient(listOf(Slate9, gradientBottomColor))
@@ -160,7 +187,7 @@ fun SplashScreen(onSplashComplete: () -> Unit) {
 @Composable
 private fun SplashScreenLightPreview() {
     ShadowMemoirTheme(darkTheme = false) {
-        SplashScreen(onSplashComplete = {})
+        SplashContent(onAnimationComplete = {})
     }
 }
 
@@ -173,6 +200,6 @@ private fun SplashScreenLightPreview() {
 @Composable
 private fun SplashScreenDarkPreview() {
     ShadowMemoirTheme(darkTheme = true) {
-        SplashScreen(onSplashComplete = {})
+        SplashContent(onAnimationComplete = {})
     }
 }
