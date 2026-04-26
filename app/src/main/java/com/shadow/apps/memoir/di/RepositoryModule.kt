@@ -2,11 +2,19 @@ package com.shadow.apps.memoir.di
 
 import com.shadow.apps.memoir.data.firebase.FirebaseManager
 import com.shadow.apps.memoir.data.firebase.auth.FirebaseAuthRepository
+import com.shadow.apps.memoir.data.firebase.category.FirebaseCategoryRepository
+import com.shadow.apps.memoir.data.firebase.currency.FirebaseCurrencyRepository
+import com.shadow.apps.memoir.data.firebase.diary.FirebaseDiaryRepository
+import com.shadow.apps.memoir.data.firebase.expense.FirebaseExpenseRepository
 import com.shadow.apps.memoir.data.firebase.profile.FirebaseProfileRepository
 import com.shadow.apps.memoir.data.fx.FrankfurterFxRepository
 import com.shadow.apps.memoir.data.preferences.EncryptedConfigRepository
 import com.shadow.apps.memoir.domain.repository.AuthRepository
+import com.shadow.apps.memoir.domain.repository.CategoryRepository
 import com.shadow.apps.memoir.domain.repository.ConfigRepository
+import com.shadow.apps.memoir.domain.repository.CurrencyRepository
+import com.shadow.apps.memoir.domain.repository.DiaryRepository
+import com.shadow.apps.memoir.domain.repository.ExpenseRepository
 import com.shadow.apps.memoir.domain.repository.FirebaseAppRepository
 import com.shadow.apps.memoir.domain.repository.FxRepository
 import com.shadow.apps.memoir.domain.repository.ProfileRepository
@@ -49,6 +57,29 @@ abstract class RepositoryModule {
     abstract fun bindConfigRepository(
         repository: EncryptedConfigRepository,
     ): ConfigRepository
+
+    /*
+     * Record repositories
+     */
+    @Binds
+    abstract fun bindExpenseRepository(
+        repository: FirebaseExpenseRepository,
+    ): ExpenseRepository
+
+    @Binds
+    abstract fun bindDiaryRepository(
+        repository: FirebaseDiaryRepository,
+    ): DiaryRepository
+
+    @Binds
+    abstract fun bindCategoryRepository(
+        repository: FirebaseCategoryRepository,
+    ): CategoryRepository
+
+    @Binds
+    abstract fun bindCurrencyRepository(
+        repository: FirebaseCurrencyRepository,
+    ): CurrencyRepository
 
     /*
      * External service repositories

@@ -23,3 +23,11 @@ data class CurrencyListResult(
     val currencies: List<CurrencyOption>,
     val isFallback: Boolean,
 )
+
+data class EnabledCurrency(
+    val code: String,
+    val name: String,
+    val isDefault: Boolean,
+) {
+    val label: String = "$code — $name"
+}

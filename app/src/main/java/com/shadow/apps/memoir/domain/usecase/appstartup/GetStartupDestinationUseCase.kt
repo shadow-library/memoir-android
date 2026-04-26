@@ -13,14 +13,17 @@ import javax.inject.Inject
 class GetStartupDestinationUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
     private val authRepository: AuthRepository,
+    private val hasPendingSeeds: HasPendingSeedsUseCase,
 ) {
-    /*
-     * Execution
-     */
-    operator fun invoke(): StartupDestination = when {
-        !configRepository.hasFirebaseCredentials() -> StartupDestination.GettingStarted
-        !authRepository.isSignedIn() -> StartupDestination.SignIn
-        !configRepository.hasCompletedSetup() -> StartupDestination.DeviceSetup
-        else -> StartupDestination.Home
+    suspend operator fun invoke(): StartupDestination {
+        val base = when {
+            !configRepository.hasFirebaseCredentials() -> StartupDestination.GettingStarted
+            !authRepository.isSignedIn() -> StartupDestination.SignIn
+            !configRepository.hasCompletedSetup() -> StartupDestination.DeviceSetup
+            else -> StartupDestination.Home
+        }
+        return if (base == StartupDestination.Home && hasPendingSeeds()) {
+            StartupDestination.AccountSetup
+        } else base
     }
 }

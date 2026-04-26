@@ -1,6 +1,7 @@
 package com.shadow.apps.memoir.data.firebase.profile
 
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.shadow.apps.memoir.data.firebase.FirebaseManager
 import com.shadow.apps.memoir.domain.repository.ProfileRepository
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -81,6 +82,25 @@ class FirebaseProfileRepository @Inject constructor(
                 transaction.update(ref, updates)
             }
         }
+            .addOnSuccessListener { cont.resume(Unit) }
+            .addOnFailureListener { cont.resumeWithException(it) }
+    }
+
+    /*
+     * Seed tracker
+     */
+    override suspend fun getAppliedSeeds(uid: String): Set<String> = suspendCancellableCoroutine { cont ->
+        userRef(uid).get()
+            .addOnSuccessListener { snapshot ->
+                @Suppress("UNCHECKED_CAST")
+                val list = snapshot.get("appliedSeeds") as? List<String>
+                cont.resume(list?.toSet() ?: emptySet())
+            }
+            .addOnFailureListener { cont.resumeWithException(it) }
+    }
+
+    override suspend fun markSeedApplied(uid: String, seedId: String): Unit = suspendCancellableCoroutine { cont ->
+        userRef(uid).update("appliedSeeds", FieldValue.arrayUnion(seedId))
             .addOnSuccessListener { cont.resume(Unit) }
             .addOnFailureListener { cont.resumeWithException(it) }
     }

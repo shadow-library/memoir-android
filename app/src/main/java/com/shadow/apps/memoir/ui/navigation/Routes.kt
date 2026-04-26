@@ -17,7 +17,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable object ScanQr
 @Serializable object DeviceSetup
-@Serializable object SetupComplete
+@Serializable data class AccountSetup(
+    val defaultCurrencyCode: String = "",
+    val defaultCurrencyName: String = "",
+)
 
 /** ── Main app ────────────────────────────────────────────────────────────── */
 

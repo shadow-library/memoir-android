@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,7 +30,6 @@ import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
 fun MainBottomBar(
     selectedTab: TabDestination,
     onTabSelected: (TabDestination) -> Unit,
-    onFabClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -56,34 +53,14 @@ fun MainBottomBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                TabItem(
-                    destination = TabDestination.TODAY,
-                    isSelected = selectedTab == TabDestination.TODAY,
-                    onTabSelected = onTabSelected,
-                    modifier = Modifier.weight(1f),
-                )
-                TabItem(
-                    destination = TabDestination.MONEY,
-                    isSelected = selectedTab == TabDestination.MONEY,
-                    onTabSelected = onTabSelected,
-                    modifier = Modifier.weight(1f),
-                )
-                FabButton(
-                    onClick = onFabClick,
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                )
-                TabItem(
-                    destination = TabDestination.DIARY,
-                    isSelected = selectedTab == TabDestination.DIARY,
-                    onTabSelected = onTabSelected,
-                    modifier = Modifier.weight(1f),
-                )
-                TabItem(
-                    destination = TabDestination.MORE,
-                    isSelected = selectedTab == TabDestination.MORE,
-                    onTabSelected = onTabSelected,
-                    modifier = Modifier.weight(1f),
-                )
+                TabDestination.entries.forEach { destination ->
+                    TabItem(
+                        destination = destination,
+                        isSelected = selectedTab == destination,
+                        onTabSelected = onTabSelected,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }
@@ -131,37 +108,11 @@ private fun TabItem(
     }
 }
 
-@Composable
-private fun FabButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.size(56.dp),
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.primary,
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Quick add",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp),
-            )
-        }
-    }
-}
-
 @Preview(name = "Bottom Bar – Light", showBackground = true)
 @Composable
 private fun MainBottomBarLightPreview() {
     ShadowMemoirTheme(darkTheme = false) {
-        MainBottomBar(
-            selectedTab = TabDestination.TODAY,
-            onTabSelected = {},
-            onFabClick = {},
-        )
+        MainBottomBar(selectedTab = TabDestination.TODAY, onTabSelected = {})
     }
 }
 
@@ -169,10 +120,6 @@ private fun MainBottomBarLightPreview() {
 @Composable
 private fun MainBottomBarDarkPreview() {
     ShadowMemoirTheme(darkTheme = true) {
-        MainBottomBar(
-            selectedTab = TabDestination.TODAY,
-            onTabSelected = {},
-            onFabClick = {},
-        )
+        MainBottomBar(selectedTab = TabDestination.TODAY, onTabSelected = {})
     }
 }

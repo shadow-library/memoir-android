@@ -2,6 +2,7 @@ package com.shadow.apps.memoir.domain.usecase.onboarding
 
 import com.shadow.apps.memoir.domain.model.StartupDestination
 import com.shadow.apps.memoir.domain.repository.ConfigRepository
+import com.shadow.apps.memoir.domain.usecase.appstartup.HasPendingSeedsUseCase
 import javax.inject.Inject
 
 /*
@@ -11,10 +12,10 @@ import javax.inject.Inject
  */
 class GetPostSignInDestinationUseCase @Inject constructor(
     private val configRepository: ConfigRepository,
+    private val hasPendingSeeds: HasPendingSeedsUseCase,
 ) {
-    /*
-     * Execution
-     */
-    operator fun invoke(): StartupDestination =
-        if (configRepository.hasCompletedSetup()) StartupDestination.Home else StartupDestination.DeviceSetup
+    suspend operator fun invoke(): StartupDestination {
+        if (!configRepository.hasCompletedSetup()) return StartupDestination.DeviceSetup
+        return if (hasPendingSeeds()) StartupDestination.AccountSetup else StartupDestination.Home
+    }
 }
