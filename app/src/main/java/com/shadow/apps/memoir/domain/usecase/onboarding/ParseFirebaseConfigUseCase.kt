@@ -36,12 +36,13 @@ class ParseFirebaseConfigUseCase @Inject constructor() {
             }
         }
 
+        if (webClientId.isNullOrBlank()) return@runCatching null
+
         FirebaseCredentials(
             projectId = projectInfo.getString("project_id"),
             appId = clientInfo.getString("mobilesdk_app_id"),
             apiKey = apiKey,
             storageBucket = storageBucket,
-            databaseUrl = projectInfo.optString("firebase_url").takeIf { it.isNotBlank() },
             webClientId = webClientId,
         )
     }.getOrNull()
@@ -55,7 +56,8 @@ class ParseFirebaseConfigUseCase @Inject constructor() {
         val apiKey = root.getString("k")
         val appId = root.getString("a")
         val storageBucket = root.getString("s")
-        if (projectId.isBlank() || apiKey.isBlank() || appId.isBlank() || storageBucket.isBlank()) {
+        val webClientId = root.getString("w")
+        if (projectId.isBlank() || apiKey.isBlank() || appId.isBlank() || storageBucket.isBlank() || webClientId.isBlank()) {
             return@runCatching null
         }
         FirebaseCredentials(
@@ -63,8 +65,7 @@ class ParseFirebaseConfigUseCase @Inject constructor() {
             appId = appId,
             apiKey = apiKey,
             storageBucket = storageBucket,
-            databaseUrl = root.optString("d").takeIf { it.isNotBlank() },
-            webClientId = root.optString("w").takeIf { it.isNotBlank() },
+            webClientId = webClientId,
         )
     }.getOrNull()
 }

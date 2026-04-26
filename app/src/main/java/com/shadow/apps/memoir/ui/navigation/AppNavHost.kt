@@ -125,7 +125,7 @@ fun AppNavHost(navController: NavHostController) {
                 },
                 onContinue = {
                     navController.navigate(SetupComplete) {
-                        popUpTo<GettingStarted> { inclusive = true }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 },
             )

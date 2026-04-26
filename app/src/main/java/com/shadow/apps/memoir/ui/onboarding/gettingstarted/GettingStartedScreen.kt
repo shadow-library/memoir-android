@@ -3,12 +3,10 @@ package com.shadow.apps.memoir.ui.onboarding.gettingstarted
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -40,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.shadow.apps.memoir.R
+import com.shadow.apps.memoir.ui.components.AppScreen
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan1
 import com.shadow.apps.memoir.ui.theme.Cyan5
@@ -47,9 +45,6 @@ import com.shadow.apps.memoir.ui.theme.Cyan6
 import com.shadow.apps.memoir.ui.theme.Emerald200
 import com.shadow.apps.memoir.ui.theme.Emerald500
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
-import com.shadow.apps.memoir.ui.theme.Slate0
-import com.shadow.apps.memoir.ui.theme.Slate8
-import com.shadow.apps.memoir.ui.theme.Slate9
 import com.shadow.apps.memoir.ui.theme.Terracotta1
 import com.shadow.apps.memoir.ui.theme.Terracotta5
 import com.shadow.apps.memoir.ui.theme.Violet200
@@ -72,14 +67,6 @@ private data class FeatureItem(
  */
 @Composable
 fun GettingStartedScreen(onGetStarted: () -> Unit) {
-    val isDark = isSystemInDarkTheme()
-
-    val background = if (isDark) {
-        Modifier.background(Brush.verticalGradient(listOf(Slate9, Slate8)))
-    } else {
-        Modifier.background(Slate0)
-    }
-
     val features = listOf(
         FeatureItem(
             icon = Icons.Outlined.AccountBalanceWallet,
@@ -111,10 +98,29 @@ fun GettingStartedScreen(onGetStarted: () -> Unit) {
         ),
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(background),
+    AppScreen(
+        footer = {
+            PageDots(total = 5, current = 0)
+
+            Spacer(Modifier.height(24.dp))
+
+            Button(
+                onClick = onGetStarted,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Cyan5),
+            ) {
+                Text(
+                    text = stringResource(R.string.getting_started_cta),
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+
+            Spacer(Modifier.height(36.dp))
+        },
     ) {
         Column(
             modifier = Modifier
@@ -122,31 +128,30 @@ fun GettingStartedScreen(onGetStarted: () -> Unit) {
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
         ) {
-            Spacer(Modifier.height(56.dp))
-
-            Text(
-                text = stringResource(R.string.getting_started_welcome_label),
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 3.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-            )
-
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(24.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                /** Decorative icon; the app name follows in the adjacent Text. */
                 Image(
                     painter = painterResource(R.drawable.ic_memoir_logo),
                     contentDescription = null,
-                    modifier = Modifier.size(28.dp),
+                    modifier = Modifier.size(50.dp),
                 )
-                Spacer(Modifier.size(8.dp))
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+                Spacer(Modifier.size(12.dp))
+                Column {
+                    Text(
+                        text = stringResource(R.string.getting_started_welcome_label),
+                        style = MaterialTheme.typography.labelSmall,
+                        letterSpacing = 3.sp,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
             }
 
             Spacer(Modifier.height(36.dp))
@@ -174,32 +179,6 @@ fun GettingStartedScreen(onGetStarted: () -> Unit) {
             }
 
             Spacer(Modifier.height(24.dp))
-        }
-
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            PageDots(total = 5, current = 0)
-
-            Spacer(Modifier.height(24.dp))
-
-            Button(
-                onClick = onGetStarted,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Cyan5),
-            ) {
-                Text(
-                    text = stringResource(R.string.getting_started_cta),
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-
-            Spacer(Modifier.height(36.dp))
         }
     }
 }

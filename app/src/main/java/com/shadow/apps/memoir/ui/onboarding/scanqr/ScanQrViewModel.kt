@@ -1,20 +1,25 @@
 package com.shadow.apps.memoir.ui.onboarding.scanqr
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.shadow.apps.memoir.domain.model.FirebaseCredentials
 import com.shadow.apps.memoir.domain.usecase.onboarding.ParseFirebaseConfigUseCase
 import com.shadow.apps.memoir.domain.usecase.onboarding.SaveFirebaseCredentialsUseCase
+import com.shadow.apps.memoir.domain.usecase.onboarding.VerificationResult
+import com.shadow.apps.memoir.domain.usecase.onboarding.VerifyFirebaseCredentialsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ScanQrViewModel @Inject constructor(
     private val parseFirebaseConfig: ParseFirebaseConfigUseCase,
     private val saveFirebaseCredentials: SaveFirebaseCredentialsUseCase,
+    private val verifyFirebaseCredentials: VerifyFirebaseCredentialsUseCase,
 ) : ViewModel() {
 
     /*
@@ -38,23 +43,39 @@ class ScanQrViewModel @Inject constructor(
                     apiKey = creds.apiKey,
                     appId = creds.appId,
                     storageBucket = creds.storageBucket,
-                    databaseUrl = creds.databaseUrl ?: "",
-                    webClientId = creds.webClientId ?: "",
+                    webClientId = creds.webClientId,
                     error = null,
                 )
             }
         } else {
-            _uiState.update { it.copy(error = "Invalid QR code \u2014 expected a Memoir config") }
+            _uiState.update { it.copy(error = "Invalid QR code — expected a Memoir config") }
         }
     }
 
     fun saveAndContinue(onSuccess: () -> Unit) {
         val state = _uiState.value
-        if (!state.isConfigReceived) return
-        _uiState.update { it.copy(isSaving = true) }
-        saveFirebaseCredentials(state.toCredentials())
-        _uiState.update { it.copy(isSaving = false) }
-        onSuccess()
+        if (!state.isConfigReceived || state.isSaving) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true, verificationError = null) }
+            val result = verifyFirebaseCredentials(state.apiKey.trim(), state.webClientId.trim())
+            when (result) {
+                is VerificationResult.Valid -> {
+                    saveFirebaseCredentials(state.toCredentials())
+                    _uiState.update { it.copy(isSaving = false) }
+                    onSuccess()
+                }
+                is VerificationResult.InvalidApiKey -> _uiState.update {
+                    it.copy(isSaving = false, verificationError = "API key is invalid — check your Firebase project settings")
+                }
+                is VerificationResult.InvalidWebClientId -> _uiState.update {
+                    it.copy(isSaving = false, verificationError = "Web Client ID not found — ensure Google Sign-In is enabled in Firebase Console")
+                }
+                is VerificationResult.NetworkError -> _uiState.update {
+                    it.copy(isSaving = false, verificationError = "Could not reach Firebase — check your internet connection")
+                }
+            }
+        }
     }
 
     /*
@@ -66,7 +87,6 @@ class ScanQrViewModel @Inject constructor(
             appId = appId.trim(),
             apiKey = apiKey.trim(),
             storageBucket = storageBucket.trim(),
-            databaseUrl = databaseUrl.trim().takeIf { it.isNotBlank() },
-            webClientId = webClientId.trim().takeIf { it.isNotBlank() },
+            webClientId = webClientId.trim(),
         )
 }

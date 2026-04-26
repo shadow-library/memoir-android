@@ -8,9 +8,9 @@ data class ScanQrUiState(
     val apiKey: String = "",
     val appId: String = "",
     val storageBucket: String = "",
-    val databaseUrl: String = "",
     val webClientId: String = "",
     val error: String? = null,
+    val verificationError: String? = null,
     val isSaving: Boolean = false,
 ) {
     val isConfigReceived: Boolean get() = scanState == ScanState.Success

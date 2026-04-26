@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -76,10 +77,10 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 import com.shadow.apps.memoir.R
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
+import com.shadow.apps.memoir.ui.components.AppScreen
 import com.shadow.apps.memoir.ui.theme.Cyan5
 import com.shadow.apps.memoir.ui.theme.Emerald500
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
-import com.shadow.apps.memoir.ui.theme.Slate0
 import com.shadow.apps.memoir.ui.theme.Slate1
 import com.shadow.apps.memoir.ui.theme.Slate7
 import com.shadow.apps.memoir.ui.theme.Slate8
@@ -117,11 +118,6 @@ private fun ScanQrContent(
     onQrScanned: (String) -> Unit,
 ) {
     val isDark = isSystemInDarkTheme()
-    val background = if (isDark) {
-        Modifier.background(Brush.verticalGradient(listOf(Slate9, Slate8)))
-    } else {
-        Modifier.background(Slate0)
-    }
 
     val context = LocalContext.current
     val isPreview = LocalInspectionMode.current
@@ -143,14 +139,58 @@ private fun ScanQrContent(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(background),
+    AppScreen(
+        footer = {
+            PageDots(total = 5, current = 2)
+            Spacer(Modifier.height(16.dp))
+            if (uiState.verificationError != null) {
+                Text(
+                    text = uiState.verificationError,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+            Button(
+                onClick = onContinue,
+                enabled = uiState.isConfigReceived,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "Verifying…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.scan_qr_continue),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                }
+            }
+            TextButton(onClick = onEnterManually) {
+                Text(
+                    text = stringResource(R.string.scan_qr_enter_manually),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
+                )
+            }
+            Spacer(Modifier.height(20.dp))
+        },
     ) {
         // ── Header ──────────────────────────────────────────────────────
         Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(24.dp))
 
             Row(
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -241,35 +281,6 @@ private fun ScanQrContent(
         }
 
         Spacer(Modifier.height(16.dp))
-
-        // ── Footer ──────────────────────────────────────────────────────
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            PageDots(total = 5, current = 2)
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = onContinue,
-                enabled = uiState.isConfigReceived && !uiState.isSaving,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.scan_qr_continue),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            TextButton(onClick = onEnterManually) {
-                Text(
-                    text = stringResource(R.string.scan_qr_enter_manually),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
-                )
-            }
-            Spacer(Modifier.height(20.dp))
-        }
     }
 }
 

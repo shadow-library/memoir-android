@@ -3,7 +3,6 @@ package com.shadow.apps.memoir.ui.onboarding.devicesetup
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,16 +48,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.shadow.apps.memoir.R
 import com.shadow.apps.memoir.domain.model.CurrencyOption
+import com.shadow.apps.memoir.ui.components.AppScreen
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan5
 import com.shadow.apps.memoir.ui.theme.Cyan6
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
-import com.shadow.apps.memoir.ui.theme.Slate0
 import com.shadow.apps.memoir.ui.theme.Slate1
 import com.shadow.apps.memoir.ui.theme.Slate6
 import com.shadow.apps.memoir.ui.theme.Slate7
-import com.shadow.apps.memoir.ui.theme.Slate8
-import com.shadow.apps.memoir.ui.theme.Slate9
 
 private val PreviewCurrencies = listOf(
     CurrencyOption("INR", "Indian Rupee"),
@@ -95,28 +91,40 @@ private fun DeviceSetupContent(
     onFinish: () -> Unit,
 ) {
     val isDark = isSystemInDarkTheme()
-    val backgroundModifier = if (isDark) {
-        Modifier.background(Brush.verticalGradient(listOf(Slate9, Slate8)))
-    } else {
-        Modifier.background(Slate0)
-    }
 
     if (uiState.isLoadingProfile) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(backgroundModifier),
-            contentAlignment = Alignment.Center,
-        ) {
-            CircularProgressIndicator(color = Cyan5, strokeWidth = 2.dp)
+        AppScreen {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator(color = Cyan5, strokeWidth = 2.dp)
+            }
         }
         return
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(backgroundModifier),
+    AppScreen(
+        footer = {
+            if (uiState.error != null) {
+                Text(
+                    text = uiState.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                )
+            }
+
+            PageDots(total = 5, current = 4)
+
+            Spacer(Modifier.height(16.dp))
+
+            FinishButton(isLoading = uiState.isSaving, onClick = onFinish)
+
+            Spacer(Modifier.height(36.dp))
+        },
     ) {
         Column(
             modifier = Modifier
@@ -124,7 +132,7 @@ private fun DeviceSetupContent(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(24.dp))
 
             Surface(
                 onClick = onBack,
@@ -244,30 +252,6 @@ private fun DeviceSetupContent(
             }
 
             Spacer(Modifier.height(24.dp))
-        }
-
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (uiState.error != null) {
-                Text(
-                    text = uiState.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                )
-            }
-
-            PageDots(total = 5, current = 4)
-
-            Spacer(Modifier.height(16.dp))
-
-            FinishButton(isLoading = uiState.isSaving, onClick = onFinish)
-
-            Spacer(Modifier.height(36.dp))
         }
     }
 }
