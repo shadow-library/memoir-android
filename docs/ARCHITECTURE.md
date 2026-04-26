@@ -45,7 +45,7 @@ Shadow Memoir is a native Android personal life-tracking platform. It serves as 
 | Subscription Tracking | Pre-paid and recurring subscriptions with two-view monthly budget |
 | Health & Wearables | Sleep, heart rate, steps, and workouts from Galaxy Fit 3 via Android Health Connect |
 | Action Tracking | Fully custom user-defined habits and daily activity logs |
-| Diary & Journaling | Multiple daily entries with mood and custom structured tags |
+| Diary & Journaling | Multiple daily entries with custom structured tags |
 | Analytics | Month-over-month summaries with cross-module correlations |
 | Notifications & Nudges | Spend alerts, subscription renewals, action reminders |
 | Data Export | CSV and JSON export for external analysis |
@@ -258,7 +258,6 @@ erDiagram
         string date
         int entryIndex
         string content
-        string mood
         object[] tags
         timestamp updatedAt
         string deviceId
@@ -409,7 +408,6 @@ Multiple entries per day. **Last-write-wins** — no version field. `entryIndex`
   "date": "2025-03-14",
   "entryIndex": 0,
   "content": "Free-form journal text...",
-  "mood": "motivated",
   "tags": [
     { "type": "energy", "value": 8 },
     { "type": "gratitude", "value": "Good focus today" },
@@ -420,8 +418,6 @@ Multiple entries per day. **Last-write-wins** — no version field. `entryIndex`
   "deviceId": "device-uuid"
 }
 ```
-
-**Mood values:** `happy` `motivated` `calm` `neutral` `tired` `anxious` `frustrated` `sad` `grateful` `excited`
 
 ---
 
@@ -498,16 +494,6 @@ Stored at `/users/{uid}/analytics/monthly/2025-03`. **Read-only from the app.** 
   "actionSummary": {
     "codingDays": 18,
     "avgProductivityScale": 7.2
-  },
-  "moodSummary": {
-    "dominantMood": "motivated",
-    "avgEnergyLevel": 6.8,
-    "moodDistribution": {
-      "motivated": 10,
-      "calm": 8,
-      "tired": 7,
-      "anxious": 5
-    }
   },
   "vsLastMonth": {
     "cashViewDeltaINR": 3200,
@@ -866,7 +852,7 @@ The old linked expense remains in history unchanged.
 
 ### Concept
 
-Multiple diary entries can be written per calendar day. Each entry has free-form text content, a mood selection, and one or more structured tags. There is no length limit on content.
+Multiple diary entries can be written per calendar day. Each entry has free-form text content and one or more structured tags. There is no length limit on content.
 
 ### Entry Tags
 
@@ -923,7 +909,7 @@ id, date, merchant, category, tags, amount, currency, amount_inr,
 fx_rate_used, fx_date, is_subscription_payment, subscription_id,
 sleep_hours, sleep_quality, avg_heart_rate, resting_heart_rate,
 stress_score, step_count, active_minutes, workout_type,
-workout_duration_minutes, diary_mood, diary_energy_level
+workout_duration_minutes, diary_energy_level
 ```
 
 ### Analytics Pipeline
@@ -932,7 +918,7 @@ workout_duration_minutes, diary_mood, diary_energy_level
 flowchart LR
     A["Firestore<br/>Operational Zone"] --> B["extract.py<br/>Fetch all collections<br/>for the period"]
     B --> C["transform.py<br/>Cash view aggregations<br/>Budget view aggregations<br/>Subscription amortisation"]
-    C --> D["correlate.py<br/>Health vs spend<br/>Mood vs actions<br/>Stress vs spend"]
+    C --> D["correlate.py<br/>Health vs spend<br/>Stress vs spend"]
     D --> E["load.py<br/>Write MonthlyAnalytics<br/>document — idempotent"]
     E --> F["Firestore<br/>/analytics/monthly/{ym}"]
     F --> G["App<br/>Read-only display<br/>both views available"]
@@ -1003,7 +989,6 @@ The following are explicitly out of scope for v1.0 and should be planned as sepa
 - **Per-category monthly budgets** — set spend limits with threshold notifications
 - **Recurring expense auto-detection** — suggest flagging regular merchants as subscriptions
 - **Goal tracking per action** — e.g. "code at least 20 days this month" with progress bar
-- **Mood vs spend overlay chart** — visual correlation of diary mood with daily spend
 - **Automated analytics pipeline** — replace manual Python script with Firebase Cloud Function or home-server cron once schema is stable
 - **Wear OS native companion** — quick expense entry and action logging from wrist
 - **Web dashboard** — read-only browser analytics view using the same Firestore project

@@ -9,5 +9,6 @@ enum class StartupDestination {
     GettingStarted,
     SignIn,
     DeviceSetup,
+    AccountSetup,
     Home,
 }

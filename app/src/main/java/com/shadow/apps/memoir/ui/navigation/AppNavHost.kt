@@ -6,12 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.shadow.apps.memoir.domain.model.StartupDestination
 import com.shadow.apps.memoir.ui.main.MainShell
+import com.shadow.apps.memoir.ui.main.record.AddDiaryScreen
+import com.shadow.apps.memoir.ui.main.record.AddExpenseScreen
 import com.shadow.apps.memoir.ui.onboarding.devicesetup.DeviceSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.devicetype.DeviceTypeScreen
 import com.shadow.apps.memoir.ui.onboarding.firebasesetup.FirebaseSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.gettingstarted.GettingStartedScreen
+import com.shadow.apps.memoir.ui.onboarding.accountsetup.AccountSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.scanqr.ScanQrScreen
-import com.shadow.apps.memoir.ui.onboarding.setupcomplete.SetupCompleteScreen
 import com.shadow.apps.memoir.ui.onboarding.signin.SignInScreen
 import com.shadow.apps.memoir.ui.splash.SplashScreen
 
@@ -34,6 +36,7 @@ fun AppNavHost(navController: NavHostController) {
                     StartupDestination.GettingStarted -> GettingStarted
                     StartupDestination.SignIn -> SignIn
                     StartupDestination.DeviceSetup -> DeviceSetup
+                    StartupDestination.AccountSetup -> AccountSetup()
                     StartupDestination.Home -> Home
                 }
                 navController.navigate(dest) {
@@ -105,6 +108,7 @@ fun AppNavHost(navController: NavHostController) {
                         StartupDestination.GettingStarted -> GettingStarted
                         StartupDestination.SignIn -> SignIn
                         StartupDestination.DeviceSetup -> DeviceSetup
+                        StartupDestination.AccountSetup -> AccountSetup()
                         StartupDestination.Home -> Home
                     }
                     navController.navigate(dest) {
@@ -123,19 +127,19 @@ fun AppNavHost(navController: NavHostController) {
                         }
                     }
                 },
-                onContinue = {
-                    navController.navigate(SetupComplete) {
-                        popUpTo(navController.graph.id) { inclusive = true }
+                onContinue = { code, name ->
+                    navController.navigate(AccountSetup(code, name)) {
+                        popUpTo<DeviceSetup> { inclusive = true }
                     }
                 },
             )
         }
 
-        composable<SetupComplete> {
-            SetupCompleteScreen(
+        composable<AccountSetup> {
+            AccountSetupScreen(
                 onContinue = {
                     navController.navigate(Home) {
-                        popUpTo<SetupComplete> { inclusive = true }
+                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 },
             )
@@ -146,7 +150,18 @@ fun AppNavHost(navController: NavHostController) {
          */
 
         composable<Home> {
-            MainShell()
+            MainShell(
+                onAddExpense = { navController.navigate(AddExpense) },
+                onAddDiary = { navController.navigate(AddDiaryEntry) },
+            )
+        }
+
+        composable<AddExpense> {
+            AddExpenseScreen(onClose = { navController.popBackStack() })
+        }
+
+        composable<AddDiaryEntry> {
+            AddDiaryScreen(onClose = { navController.popBackStack() })
         }
     }
 }

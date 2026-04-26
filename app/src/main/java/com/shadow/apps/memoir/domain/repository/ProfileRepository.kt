@@ -15,4 +15,8 @@ interface ProfileRepository {
         isPrimary: Boolean,
         defaultCurrency: String,
     )
+
+    suspend fun getAppliedSeeds(uid: String): Set<String>
+
+    suspend fun markSeedApplied(uid: String, seedId: String)
 }

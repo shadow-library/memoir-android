@@ -501,7 +501,7 @@ data/firebase/diary/DiaryFirestoreMapper.kt
 
 - [ ] Build diary list grouped by date
 - [ ] Add entry cards
-- [ ] Add mood/tag summary
+- [ ] Add tag summary
 - [ ] Add empty, loading, and error states
 
 #### Firebase / Data Integration
@@ -526,7 +526,6 @@ domain/usecase/diary/SaveDiaryEntryUseCase.kt
 #### UI + State
 
 - [ ] Build create/edit entry UI
-- [ ] Add mood selector
 - [ ] Add structured tags UI
 - [ ] Add validation, error, and loading states
 

@@ -65,7 +65,7 @@ private val PreviewCurrencies = listOf(
 @Composable
 fun DeviceSetupScreen(
     onBack: () -> Unit,
-    onContinue: () -> Unit,
+    onContinue: (currencyCode: String, currencyName: String) -> Unit,
     viewModel: DeviceSetupViewModel = hiltViewModel(),
 ) {
     BackHandler(onBack = onBack)
@@ -77,7 +77,13 @@ fun DeviceSetupScreen(
         onDeviceNameChange = viewModel::onDeviceNameChange,
         onIsPrimaryChange = viewModel::onIsPrimaryChange,
         onCurrencySelect = viewModel::onCurrencySelect,
-        onFinish = { viewModel.finishSetup(onContinue) },
+        onFinish = {
+            viewModel.finishSetup {
+                val name = uiState.currencies.firstOrNull { it.code == uiState.selectedCurrency }?.name
+                    ?: uiState.selectedCurrency
+                onContinue(uiState.selectedCurrency, name)
+            }
+        },
     )
 }
 

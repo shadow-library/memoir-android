@@ -48,18 +48,4 @@ val Amber200 = Color(0xFFFFE082)   // Finance: tinted containers
 val Amber500 = Color(0xFFFFB300)   // Finance: budget warnings / renewal alerts
 
 val Violet200 = Color(0xFFC5AEF8)  // Analytics: tinted containers
-val Violet500 = Color(0xFF7C3AED)  // Analytics: correlations / mood analytics
-
-// ── Mood → colour (diary entries and analytics) ────────────────────────────
-val MoodColours: Map<String, Color> = mapOf(
-    "happy" to Cyan4,
-    "excited" to Cyan4,
-    "grateful" to Cyan4,
-    "motivated" to Emerald500,
-    "calm" to Violet500,
-    "neutral" to Slate4,
-    "tired" to Slate4,
-    "sad" to Slate4,
-    "anxious" to Amber500,
-    "frustrated" to Terracotta4,
-)
+val Violet500 = Color(0xFF7C3AED)  // Analytics: correlations

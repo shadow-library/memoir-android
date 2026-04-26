@@ -1451,8 +1451,6 @@ data/firebase/health/HealthFirestoreMapper.kt
 ui/diary/editor/DiaryEntryScreen.kt
 ui/diary/editor/DiaryEntryViewModel.kt
 ui/diary/editor/DiaryEntryUiState.kt
-ui/diary/components/MoodSelector.kt
-
 domain/model/DiaryEntry.kt
 domain/repository/DiaryRepository.kt
 domain/usecase/diary/SaveDiaryEntryUseCase.kt

@@ -1,6 +1,7 @@
 package com.shadow.apps.memoir.ui.splash
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.shadow.apps.memoir.domain.usecase.appstartup.GetStartupDestinationUseCase
 import com.shadow.apps.memoir.domain.usecase.appstartup.InitialiseFirebaseFromStoredConfigUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /*
@@ -21,17 +23,13 @@ class SplashViewModel @Inject constructor(
     private val getStartupDestination: GetStartupDestinationUseCase,
 ) : ViewModel() {
 
-    /*
-     * State
-     */
     private val _uiState = MutableStateFlow(SplashUiState())
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
 
-    /*
-     * Events
-     */
     fun resolveStartupDestination() {
-        initialiseFirebaseFromStoredConfig()
-        _uiState.update { it.copy(destination = getStartupDestination()) }
+        viewModelScope.launch {
+            initialiseFirebaseFromStoredConfig()
+            _uiState.update { it.copy(destination = getStartupDestination()) }
+        }
     }
 }
