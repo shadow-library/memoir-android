@@ -5,7 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.shadow.apps.memoir.domain.model.StartupDestination
-import com.shadow.apps.memoir.ui.home.HomeScreen
+import com.shadow.apps.memoir.ui.main.MainShell
 import com.shadow.apps.memoir.ui.onboarding.devicesetup.DeviceSetupScreen
 import com.shadow.apps.memoir.ui.onboarding.devicetype.DeviceTypeScreen
 import com.shadow.apps.memoir.ui.onboarding.firebasesetup.FirebaseSetupScreen
@@ -146,7 +146,7 @@ fun AppNavHost(navController: NavHostController) {
          */
 
         composable<Home> {
-            HomeScreen()
+            MainShell()
         }
     }
 }
