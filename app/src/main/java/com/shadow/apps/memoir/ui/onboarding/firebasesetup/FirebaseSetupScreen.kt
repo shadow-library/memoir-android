@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.UploadFile
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.shadow.apps.memoir.R
+import com.shadow.apps.memoir.ui.components.AppScreen
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan5
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
@@ -56,7 +59,6 @@ import com.shadow.apps.memoir.ui.theme.Slate1
 import com.shadow.apps.memoir.ui.theme.Slate6
 import com.shadow.apps.memoir.ui.theme.Slate7
 import com.shadow.apps.memoir.ui.theme.Slate8
-import com.shadow.apps.memoir.ui.theme.Slate9
 import com.shadow.apps.memoir.ui.theme.Violet200
 import com.shadow.apps.memoir.ui.theme.Violet500
 
@@ -78,7 +80,12 @@ fun FirebaseSetupScreen(onBack: () -> Unit, onContinue: () -> Unit, viewModel: F
         onApiKeyChanged = viewModel::onApiKeyChanged,
         onAppIdChanged = viewModel::onAppIdChanged,
         onStorageBucketChanged = viewModel::onStorageBucketChanged,
-        onDatabaseUrlChanged = viewModel::onDatabaseUrlChanged,
+        onWebClientIdChanged = viewModel::onWebClientIdChanged,
+        onProjectIdBlurred = viewModel::onProjectIdBlurred,
+        onApiKeyBlurred = viewModel::onApiKeyBlurred,
+        onAppIdBlurred = viewModel::onAppIdBlurred,
+        onStorageBucketBlurred = viewModel::onStorageBucketBlurred,
+        onWebClientIdBlurred = viewModel::onWebClientIdBlurred,
     )
 }
 
@@ -92,129 +99,176 @@ private fun FirebaseSetupContent(
     onApiKeyChanged: (String) -> Unit,
     onAppIdChanged: (String) -> Unit,
     onStorageBucketChanged: (String) -> Unit,
-    onDatabaseUrlChanged: (String) -> Unit,
+    onWebClientIdChanged: (String) -> Unit,
+    onProjectIdBlurred: () -> Unit = {},
+    onApiKeyBlurred: () -> Unit = {},
+    onAppIdBlurred: () -> Unit = {},
+    onStorageBucketBlurred: () -> Unit = {},
+    onWebClientIdBlurred: () -> Unit = {},
 ) {
     val isDark = isSystemInDarkTheme()
-    val background = if (isDark) {
-        Modifier.background(Brush.verticalGradient(listOf(Slate9, Slate8)))
-    } else {
-        Modifier.background(Slate0)
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(background),
-    ) {
-        Box(modifier = Modifier.weight(1f)) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
-        ) {
-            Spacer(Modifier.height(48.dp))
-
-            Row(
-                modifier = Modifier.padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
+    AppScreen(
+        footer = {
+            PageDots(total = 5, current = 2)
+            Spacer(Modifier.height(16.dp))
+            if (uiState.verificationError != null) {
+                Text(
+                    text = uiState.verificationError,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+            Button(
+                onClick = onContinue,
+                enabled = uiState.isValid && uiState.hasNoErrors,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
             ) {
-                Surface(onClick = onBack, color = Color.Transparent) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.back),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
-                        )
-                    }
+                if (uiState.isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "Verifying…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.firebase_setup_continue),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
-
-            Spacer(Modifier.height(20.dp))
-
-            Text(
-                text = stringResource(R.string.firebase_setup_step),
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 1.5.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.50f),
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.firebase_setup_headline),
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(R.string.firebase_setup_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            UploadCard(
-                onFileUploaded = onFileUploaded,
-                uploadError = uiState.uploadError,
-                isDark = isDark,
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            // Divider with inline label
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+            Spacer(Modifier.height(36.dp))
+        },
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
             ) {
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
-                )
+                Spacer(Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Surface(onClick = onBack, color = Color.Transparent) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = stringResource(R.string.back),
+                                modifier = Modifier.size(18.dp),
+                                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.back),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.60f),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
                 Text(
-                    text = stringResource(R.string.firebase_setup_or_manual),
+                    text = stringResource(R.string.firebase_setup_step),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f),
-                    modifier = Modifier.padding(horizontal = 12.dp),
+                    letterSpacing = 1.5.sp,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.50f),
                 )
-                HorizontalDivider(
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.firebase_setup_headline),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = stringResource(R.string.firebase_setup_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                UploadCard(
+                    onFileUploaded = onFileUploaded,
+                    uploadError = uiState.uploadError,
+                    isDark = isDark,
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                // Divider with inline label
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
+                    )
+                    Text(
+                        text = stringResource(R.string.firebase_setup_or_manual),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.38f),
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f),
+                    )
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                FieldsSection(
+                    projectId = uiState.projectId,
+                    apiKey = uiState.apiKey,
+                    appId = uiState.appId,
+                    storageBucket = uiState.storageBucket,
+                    webClientId = uiState.webClientId,
+                    projectIdError = uiState.projectIdError,
+                    apiKeyError = uiState.apiKeyError,
+                    appIdError = uiState.appIdError,
+                    storageBucketError = uiState.storageBucketError,
+                    webClientIdError = uiState.webClientIdError,
+                    onProjectIdChanged = onProjectIdChanged,
+                    onApiKeyChanged = onApiKeyChanged,
+                    onAppIdChanged = onAppIdChanged,
+                    onStorageBucketChanged = onStorageBucketChanged,
+                    onWebClientIdChanged = onWebClientIdChanged,
+                    onProjectIdBlurred = onProjectIdBlurred,
+                    onApiKeyBlurred = onApiKeyBlurred,
+                    onAppIdBlurred = onAppIdBlurred,
+                    onStorageBucketBlurred = onStorageBucketBlurred,
+                    onWebClientIdBlurred = onWebClientIdBlurred,
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                HintCard(isDark = isDark)
+
+                Spacer(Modifier.height(24.dp))
             }
-
-            Spacer(Modifier.height(20.dp))
-
-            FieldsSection(
-                projectId = uiState.projectId,
-                apiKey = uiState.apiKey,
-                appId = uiState.appId,
-                storageBucket = uiState.storageBucket,
-                databaseUrl = uiState.databaseUrl,
-                onProjectIdChanged = onProjectIdChanged,
-                onApiKeyChanged = onApiKeyChanged,
-                onAppIdChanged = onAppIdChanged,
-                onStorageBucketChanged = onStorageBucketChanged,
-                onDatabaseUrlChanged = onDatabaseUrlChanged,
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            HintCard(isDark = isDark)
-
-            Spacer(Modifier.height(24.dp))
-        }
 
             // Fade edge — content dissolves before reaching the footer
             Box(
@@ -231,28 +285,6 @@ private fun FirebaseSetupContent(
                         ),
                     ),
             )
-        }
-
-        // Footer: dots + continue button
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            PageDots(total = 5, current = 2)
-            Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = onContinue,
-                enabled = uiState.isValid && !uiState.isSaving,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.firebase_setup_continue),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-            Spacer(Modifier.height(36.dp))
         }
     }
 }
@@ -326,12 +358,22 @@ private fun FieldsSection(
     apiKey: String,
     appId: String,
     storageBucket: String,
-    databaseUrl: String,
+    webClientId: String,
+    projectIdError: String?,
+    apiKeyError: String?,
+    appIdError: String?,
+    storageBucketError: String?,
+    webClientIdError: String?,
     onProjectIdChanged: (String) -> Unit,
     onApiKeyChanged: (String) -> Unit,
     onAppIdChanged: (String) -> Unit,
     onStorageBucketChanged: (String) -> Unit,
-    onDatabaseUrlChanged: (String) -> Unit,
+    onWebClientIdChanged: (String) -> Unit,
+    onProjectIdBlurred: () -> Unit,
+    onApiKeyBlurred: () -> Unit,
+    onAppIdBlurred: () -> Unit,
+    onStorageBucketBlurred: () -> Unit,
+    onWebClientIdBlurred: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         OutlinedTextField(
@@ -339,7 +381,11 @@ private fun FieldsSection(
             onValueChange = onProjectIdChanged,
             label = { Text(stringResource(R.string.firebase_setup_field_project_id)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            isError = projectIdError != null,
+            supportingText = projectIdError?.let { { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) onProjectIdBlurred() },
             shape = RoundedCornerShape(10.dp),
         )
         OutlinedTextField(
@@ -347,7 +393,11 @@ private fun FieldsSection(
             onValueChange = onApiKeyChanged,
             label = { Text(stringResource(R.string.firebase_setup_field_api_key)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            isError = apiKeyError != null,
+            supportingText = apiKeyError?.let { { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) onApiKeyBlurred() },
             shape = RoundedCornerShape(10.dp),
         )
         OutlinedTextField(
@@ -355,7 +405,11 @@ private fun FieldsSection(
             onValueChange = onAppIdChanged,
             label = { Text(stringResource(R.string.firebase_setup_field_app_id)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            isError = appIdError != null,
+            supportingText = appIdError?.let { { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) onAppIdBlurred() },
             shape = RoundedCornerShape(10.dp),
         )
         OutlinedTextField(
@@ -363,15 +417,23 @@ private fun FieldsSection(
             onValueChange = onStorageBucketChanged,
             label = { Text(stringResource(R.string.firebase_setup_field_storage_bucket)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            isError = storageBucketError != null,
+            supportingText = storageBucketError?.let { { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) onStorageBucketBlurred() },
             shape = RoundedCornerShape(10.dp),
         )
         OutlinedTextField(
-            value = databaseUrl,
-            onValueChange = onDatabaseUrlChanged,
-            label = { Text(stringResource(R.string.firebase_setup_field_database_url)) },
+            value = webClientId,
+            onValueChange = onWebClientIdChanged,
+            label = { Text(stringResource(R.string.firebase_setup_field_web_client_id)) },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            isError = webClientIdError != null,
+            supportingText = webClientIdError?.let { { Text(it) } },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { if (!it.isFocused) onWebClientIdBlurred() },
             shape = RoundedCornerShape(10.dp),
         )
     }
@@ -418,7 +480,7 @@ private fun FirebaseSetupLightPreview() {
             uiState = FirebaseSetupUiState(),
             onBack = {}, onContinue = {}, onFileUploaded = {},
             onProjectIdChanged = {}, onApiKeyChanged = {},
-            onAppIdChanged = {}, onStorageBucketChanged = {}, onDatabaseUrlChanged = {},
+            onAppIdChanged = {}, onStorageBucketChanged = {}, onWebClientIdChanged = {},
         )
     }
 }
@@ -431,7 +493,7 @@ private fun FirebaseSetupDarkPreview() {
             uiState = FirebaseSetupUiState(),
             onBack = {}, onContinue = {}, onFileUploaded = {},
             onProjectIdChanged = {}, onApiKeyChanged = {},
-            onAppIdChanged = {}, onStorageBucketChanged = {}, onDatabaseUrlChanged = {},
+            onAppIdChanged = {}, onStorageBucketChanged = {}, onWebClientIdChanged = {},
         )
     }
 }
@@ -449,7 +511,7 @@ private fun FirebaseSetupFilledPreview() {
             ),
             onBack = {}, onContinue = {}, onFileUploaded = {},
             onProjectIdChanged = {}, onApiKeyChanged = {},
-            onAppIdChanged = {}, onStorageBucketChanged = {}, onDatabaseUrlChanged = {},
+            onAppIdChanged = {}, onStorageBucketChanged = {}, onWebClientIdChanged = {},
         )
     }
 }

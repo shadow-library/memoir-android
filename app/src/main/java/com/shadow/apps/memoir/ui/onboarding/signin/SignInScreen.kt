@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,15 +45,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.shadow.apps.memoir.R
 import com.shadow.apps.memoir.domain.model.StartupDestination
+import com.shadow.apps.memoir.ui.components.AppScreen
 import com.shadow.apps.memoir.ui.onboarding.components.PageDots
 import com.shadow.apps.memoir.ui.theme.Cyan7
 import com.shadow.apps.memoir.ui.theme.Emerald500
 import com.shadow.apps.memoir.ui.theme.ShadowMemoirTheme
-import com.shadow.apps.memoir.ui.theme.Slate0
 import com.shadow.apps.memoir.ui.theme.Slate1
 import com.shadow.apps.memoir.ui.theme.Slate6
 import com.shadow.apps.memoir.ui.theme.Slate7
-import com.shadow.apps.memoir.ui.theme.Slate8
 import com.shadow.apps.memoir.ui.theme.Slate9
 
 /**
@@ -85,23 +83,32 @@ private fun SignInContent(
     onSignIn: () -> Unit,
 ) {
     val isDark = isSystemInDarkTheme()
-    val background = if (isDark) {
-        Modifier.background(Brush.verticalGradient(listOf(Slate9, Slate8)))
-    } else {
-        Modifier.background(Slate0)
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .then(background),
+    AppScreen(
+        footer = {
+            GoogleSignInButton(
+                onClick = onSignIn,
+                isLoading = uiState.isSigningIn,
+                isDark = isDark,
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            SecurityNote(isDark = isDark)
+
+            Spacer(Modifier.height(20.dp))
+
+            PageDots(total = 5, current = 3)
+
+            Spacer(Modifier.height(36.dp))
+        },
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 24.dp),
         ) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(24.dp))
 
             Row(
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -167,33 +174,15 @@ private fun SignInContent(
                 )
             }
         }
-
-        Column(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            GoogleSignInButton(
-                onClick = onSignIn,
-                isLoading = uiState.isSigningIn,
-                isDark = isDark,
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            SecurityNote(isDark = isDark)
-
-            Spacer(Modifier.height(20.dp))
-
-            PageDots(total = 5, current = 3)
-
-            Spacer(Modifier.height(36.dp))
-        }
     }
 }
 
 
 @Composable
-private fun FirebaseProjectCard(projectId: String, isDark: Boolean) {
+private fun FirebaseProjectCard(
+    projectId: String,
+    isDark: Boolean,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),

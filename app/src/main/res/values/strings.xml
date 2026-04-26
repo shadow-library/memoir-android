@@ -43,7 +43,7 @@
     <string name="firebase_setup_field_api_key">API Key</string>
     <string name="firebase_setup_field_app_id">App ID</string>
     <string name="firebase_setup_field_storage_bucket">Storage Bucket</string>
-    <string name="firebase_setup_field_database_url">Database URL (optional)</string>
+    <string name="firebase_setup_field_web_client_id">Web Client ID</string>
     <string name="firebase_setup_continue">Continue</string>
 
     <!-- Scan QR screen (Setup 2 of 3 — Secondary) -->

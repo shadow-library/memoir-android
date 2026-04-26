@@ -34,7 +34,6 @@ class EncryptedConfigStore @Inject constructor(
         const val KEY_APP_ID = "firebase_app_id"
         const val KEY_API_KEY = "firebase_api_key"
         const val KEY_STORAGE_BUCKET = "firebase_storage_bucket"
-        const val KEY_DATABASE_URL = "firebase_database_url"
         const val KEY_WEB_CLIENT_ID = "firebase_web_client_id"
         const val KEY_DEVICE_ID = "device_id"
         const val KEY_DEVICE_NAME = "device_name"
@@ -105,8 +104,7 @@ class EncryptedConfigStore @Inject constructor(
             putEncryptedString(KEY_APP_ID, credentials.appId)
             putEncryptedString(KEY_API_KEY, credentials.apiKey)
             putEncryptedString(KEY_STORAGE_BUCKET, credentials.storageBucket)
-            if (credentials.databaseUrl != null) putEncryptedString(KEY_DATABASE_URL, credentials.databaseUrl) else remove(KEY_DATABASE_URL)
-            if (credentials.webClientId != null) putEncryptedString(KEY_WEB_CLIENT_ID, credentials.webClientId) else remove(KEY_WEB_CLIENT_ID)
+            putEncryptedString(KEY_WEB_CLIENT_ID, credentials.webClientId)
         }
     }
 
@@ -115,13 +113,13 @@ class EncryptedConfigStore @Inject constructor(
         val appId = getEncryptedString(KEY_APP_ID) ?: return null
         val apiKey = getEncryptedString(KEY_API_KEY) ?: return null
         val bucket = getEncryptedString(KEY_STORAGE_BUCKET) ?: return null
+        val webClientId = getEncryptedString(KEY_WEB_CLIENT_ID) ?: return null
         return FirebaseCredentials(
             projectId = projectId,
             appId = appId,
             apiKey = apiKey,
             storageBucket = bucket,
-            databaseUrl = getEncryptedString(KEY_DATABASE_URL),
-            webClientId = getEncryptedString(KEY_WEB_CLIENT_ID),
+            webClientId = webClientId,
         )
     }
 
@@ -131,7 +129,6 @@ class EncryptedConfigStore @Inject constructor(
             remove(KEY_APP_ID)
             remove(KEY_API_KEY)
             remove(KEY_STORAGE_BUCKET)
-            remove(KEY_DATABASE_URL)
             remove(KEY_WEB_CLIENT_ID)
         }
     }

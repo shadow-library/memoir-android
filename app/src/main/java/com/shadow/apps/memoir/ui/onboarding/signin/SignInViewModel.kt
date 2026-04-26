@@ -43,7 +43,7 @@ class SignInViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     projectId = creds.projectId,
-                    webClientId = creds.webClientId ?: "",
+                    webClientId = creds.webClientId,
                 )
             }
         }
@@ -55,7 +55,7 @@ class SignInViewModel @Inject constructor(
     fun signIn(activityContext: Context, onSuccess: (StartupDestination) -> Unit) {
         val webClientId = _uiState.value.webClientId
         if (webClientId.isBlank()) {
-            _uiState.update { it.copy(error = "Web client ID missing \u2014 re-upload google-services.json") }
+            _uiState.update { it.copy(error = "Web client ID missing — re-upload google-services.json") }
             return
         }
 

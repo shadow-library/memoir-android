@@ -37,7 +37,6 @@ class FirebaseManager @Inject constructor(
             .setApplicationId(credentials.appId)
             .setApiKey(credentials.apiKey)
             .setStorageBucket(credentials.storageBucket)
-            .apply { credentials.databaseUrl?.let { setDatabaseUrl(it) } }
             .build()
 
         FirebaseApp.initializeApp(context, options, APP_NAME)
